@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2019
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C518A3C8-1C5F-42FB-98D3-6C91007F5083}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{2D2D3C87-8A3F-49F0-8068-F395678B32CD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agile.Data", "Agile.Data\Agile.Data.csproj", "{6CCEC1F9-8DAA-4859-9861-710122C3F6DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agile.Data.MySql", "Agile.Data.MySql\Agile.Data.MySql.csproj", "{27BBC755-9E60-4B87-A6F5-ED8135D61061}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agile.Data.Oracle", "Agile.Data.Oracle\Agile.Data.Oracle.csproj", "{755C721F-6C3C-463D-BBC3-1D6EEA052F79}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Agile.Data.SqlServer", "Agile.Data.SqlServer\Agile.Data.SqlServer.csproj", "{7089350F-A81B-4B5B-97EC-ED33EB358228}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestSqlServer", "XUnitTestSqlServer\XUnitTestSqlServer.csproj", "{C32E2065-845D-46CB-99B0-0549172F0950}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitTestOracle", "XUnitTestOracle\XUnitTestOracle.csproj", "{A8C0FE7C-46AD-4388-B18A-431FC909625D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6CCEC1F9-8DAA-4859-9861-710122C3F6DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CCEC1F9-8DAA-4859-9861-710122C3F6DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CCEC1F9-8DAA-4859-9861-710122C3F6DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CCEC1F9-8DAA-4859-9861-710122C3F6DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27BBC755-9E60-4B87-A6F5-ED8135D61061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27BBC755-9E60-4B87-A6F5-ED8135D61061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27BBC755-9E60-4B87-A6F5-ED8135D61061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27BBC755-9E60-4B87-A6F5-ED8135D61061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{755C721F-6C3C-463D-BBC3-1D6EEA052F79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{755C721F-6C3C-463D-BBC3-1D6EEA052F79}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{755C721F-6C3C-463D-BBC3-1D6EEA052F79}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{755C721F-6C3C-463D-BBC3-1D6EEA052F79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7089350F-A81B-4B5B-97EC-ED33EB358228}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7089350F-A81B-4B5B-97EC-ED33EB358228}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7089350F-A81B-4B5B-97EC-ED33EB358228}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7089350F-A81B-4B5B-97EC-ED33EB358228}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C32E2065-845D-46CB-99B0-0549172F0950}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C32E2065-845D-46CB-99B0-0549172F0950}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C32E2065-845D-46CB-99B0-0549172F0950}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C32E2065-845D-46CB-99B0-0549172F0950}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8C0FE7C-46AD-4388-B18A-431FC909625D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8C0FE7C-46AD-4388-B18A-431FC909625D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8C0FE7C-46AD-4388-B18A-431FC909625D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8C0FE7C-46AD-4388-B18A-431FC909625D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6CCEC1F9-8DAA-4859-9861-710122C3F6DE} = {C518A3C8-1C5F-42FB-98D3-6C91007F5083}
+		{27BBC755-9E60-4B87-A6F5-ED8135D61061} = {C518A3C8-1C5F-42FB-98D3-6C91007F5083}
+		{755C721F-6C3C-463D-BBC3-1D6EEA052F79} = {C518A3C8-1C5F-42FB-98D3-6C91007F5083}
+		{7089350F-A81B-4B5B-97EC-ED33EB358228} = {C518A3C8-1C5F-42FB-98D3-6C91007F5083}
+		{C32E2065-845D-46CB-99B0-0549172F0950} = {2D2D3C87-8A3F-49F0-8068-F395678B32CD}
+		{A8C0FE7C-46AD-4388-B18A-431FC909625D} = {2D2D3C87-8A3F-49F0-8068-F395678B32CD}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0ED84072-C790-466C-A3E1-897447ADF5B4}
+	EndGlobalSection
+EndGlobal
