@@ -15,25 +15,7 @@ namespace Agile.Data.Oracle
         public AgileClient(ConnectionConfig config)
         {
             this.CurrentConnectionConfig = config;
-            switch (config.DbType)
-            {
-                case DbType.MySql:
-                    DapperExtensions.SqlDialect = new MySqlDialect();
-                    break;
-                case DbType.SqlServer:
-                    DapperExtensions.SqlDialect = new SqlServerDialect();
-                    break;
-                case DbType.Oracle:
-                    DapperExtensions.SqlDialect = new OracleDialect();
-                    break;
-                case DbType.Sqlite:
-                    DapperExtensions.SqlDialect = new SqliteDialect();
-                    break;
-                case DbType.PostgreSQL:
-                    throw new Exception("开发中");
-                default:
-                    throw new Exception("ConnectionConfig.DbType is null");
-            }
+            DapperExtensions.SqlDialect = new OracleDialect();
         }
         #endregion
 
@@ -56,27 +38,7 @@ namespace Agile.Data.Oracle
         /// <returns></returns>
         public IDbConnection CreateDbConnection()
         {
-            IDbConnection conn;
-            switch (CurrentConnectionConfig.DbType)
-            {
-                case DbType.MySql:
-                    conn = new SqlConnection(CurrentConnectionConfig.ConnectionString);
-                    break;
-                case DbType.SqlServer:
-                    conn = new SqlConnection(CurrentConnectionConfig.ConnectionString);
-                    break;
-                case DbType.Oracle:
-                    conn = new OracleConnection(CurrentConnectionConfig.ConnectionString);
-                    break;
-                case DbType.Sqlite:
-                    conn = new SqlConnection(CurrentConnectionConfig.ConnectionString);
-                    break;
-                case DbType.PostgreSQL:
-                    throw new Exception("开发中");
-                default:
-                    throw new Exception("ConnectionConfig.DbType is null");
-            }
-
+            IDbConnection conn = new OracleConnection(CurrentConnectionConfig.ConnectionString);
             if (conn == null)
             {
                 throw new Exception("数据库连接创建失败");

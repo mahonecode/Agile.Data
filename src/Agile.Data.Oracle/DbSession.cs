@@ -187,7 +187,7 @@ namespace Agile.Data.Oracle
         /// <param name="param"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecuteQuery<T>(string sql, dynamic param = null, bool buffered = false) where T : class;
+        IEnumerable<T> ExecuteQueryList<T>(string sql, dynamic param = null, bool buffered = false) where T : class;
 
         /// <summary>
         /// 执行sql语句，查询分页实体集合
@@ -199,7 +199,7 @@ namespace Agile.Data.Oracle
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecuteQuery<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class;
+        IEnumerable<T> ExecuteQueryList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class;
 
         /// <summary>
         /// 执行sql语句，查询datatable
@@ -544,10 +544,7 @@ namespace Agile.Data.Oracle
         /// <returns></returns>
         public int ExecuteCommad(string sql, dynamic param = null)
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
-            }
+            DebugSql(sql, param);
             return Connection.Execute(sql, param as object, Transaction);
         }
 
@@ -561,10 +558,7 @@ namespace Agile.Data.Oracle
         /// <returns></returns>
         public T ExecuteQuerySingle<T>(string sql, dynamic param = null) where T : class
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
-            }
+            DebugSql(sql, param);
             return Connection.QuerySingle<T>(sql, param as object, Transaction);
         }
 
@@ -577,12 +571,9 @@ namespace Agile.Data.Oracle
         /// <param name="param"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecuteQuery<T>(string sql, dynamic param = null, bool buffered = false) where T : class
+        public IEnumerable<T> ExecuteQueryList<T>(string sql, dynamic param = null, bool buffered = false) where T : class
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
-            }
+            DebugSql(sql, param);
             return Connection.Query<T>(sql, param as object, Transaction, buffered);
         }
 
@@ -597,7 +588,7 @@ namespace Agile.Data.Oracle
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecuteQuery<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class
+        public IEnumerable<T> ExecuteQueryList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class
         {
             while (sql.Contains("\r\n"))
             {
@@ -627,7 +618,11 @@ namespace Agile.Data.Oracle
             }
 
             string allRowsCountSql = DapperExtensions.Instance.SqlGenerator.PageCount(sql);
+
+            DebugSql(pageSql, dynamicParameters);
             IEnumerable<T> list = Connection.Query<T>(pageSql, dynamicParameters, Transaction, true);
+
+            DebugSql(allRowsCountSql, dynamicParameters);
             allRowsCount = (int)Connection.Query(allRowsCountSql, dynamicParameters, Transaction, false).Single().Total;
             return list;
         }
@@ -641,11 +636,7 @@ namespace Agile.Data.Oracle
         /// <returns></returns>
         public DataTable ExecuteQueryDataTable(string sql, dynamic param = null)
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
-            }
-
+            DebugSql(sql, param);
             var dReader = Connection.ExecuteReader(sql, param as object, Transaction);
 
             //datareader 转 datatable
@@ -690,7 +681,11 @@ namespace Agile.Data.Oracle
             }
 
             string allRowsCountSql = DapperExtensions.Instance.SqlGenerator.PageCount(sql);
+
+            DebugSql(pageSql, dynamicParameters);
             var dReader = Connection.ExecuteReader(pageSql, dynamicParameters, Transaction);
+
+            DebugSql(allRowsCountSql, dynamicParameters);
             allRowsCount = (int)Connection.Query(allRowsCountSql, dynamicParameters, Transaction, false).Single().Total;
 
             //datareader 转 datatable
@@ -705,11 +700,7 @@ namespace Agile.Data.Oracle
         /// <returns></returns>
         public int ExecuteProc(string procName, dynamic param = null)
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(procName, param);
-            }
-
+            DebugSql(procName, param);
             return Connection.Execute(procName, param as object, Transaction, null, CommandType.StoredProcedure);
         }
 
@@ -722,11 +713,7 @@ namespace Agile.Data.Oracle
         /// <returns></returns>
         public IEnumerable<T> ExecuteProc<T>(string procName, dynamic param) where T : class
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(procName, param);
-            }
-
+            DebugSql(procName, param);
             IEnumerable<T> list = Connection.Query<T>(procName, param as object, Transaction, false, null, CommandType.StoredProcedure);
             return list;
         }
@@ -740,10 +727,7 @@ namespace Agile.Data.Oracle
         /// <returns></returns>
         public object ExecuteScalar(string sql, dynamic param = null)
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
-            }
+            DebugSql(sql, param);
             return Connection.ExecuteScalar(sql, param as object, Transaction);
         }
 
@@ -756,10 +740,7 @@ namespace Agile.Data.Oracle
         /// <returns></returns>
         public T ExecuteScalar<T>(string sql, dynamic param = null)
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
-            }
+            DebugSql(sql, param);
             return Connection.ExecuteScalar<T>(sql, param as object, Transaction);
         }
 
@@ -799,5 +780,20 @@ namespace Agile.Data.Oracle
             }
         }
         #endregion
+
+
+
+        /// <summary>
+        /// 调试sql脚本
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        private void DebugSql(string sql, object param)
+        {
+            if (DapperExtensions.Configuration.IsEnableLogEvent)
+            {
+                DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
+            }
+        }
     }
 }
