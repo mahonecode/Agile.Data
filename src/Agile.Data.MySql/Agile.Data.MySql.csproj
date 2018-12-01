@@ -4,6 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.2.0</Version>
+    <Authors>fengyanfei</Authors>
+    <Company>fengyanfei</Company>
+    <Description>dapper extension orm sqlmap sqllog</Description>
+    <PackageTags>dapper extension orm sqlmap sqllog</PackageTags>
+    <PackageReleaseNotes>dapper extension orm sqlmap sqllog</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
