@@ -13,7 +13,7 @@ namespace XUnitTestOracle
             //string connectionString = "Data Source=192.168.200.154;Initial Catalog=xjtc;User Id=sa;Password=Sendinfo.2017;Persist Security Info=True;";
             string connectionString = "Data Source=127.0.0.1;Initial Catalog=dapper;User Id=sa;Password=123456;Persist Security Info=True;";
 
-            agileClient = new AgileClient(new ConnectionConfig { ConnectionString = connectionString, DbType = DbType.Oracle });
+            agileClient = new AgileClient(new ConnectionConfig { ConnectionString = connectionString });
 
             //开启日志
             agileClient.IsEnableLogEvent = true;
@@ -34,7 +34,7 @@ namespace XUnitTestOracle
 
             foreach (var setupFile in files)
             {
-                agileClient.DBSession.ExecuteCommad(setupFile);
+                agileClient.DBSession.ExecuteSql(setupFile);
             }
         }
 

@@ -1,8 +1,10 @@
 ﻿using Agile.Data.Oracle.Extensions;
+using Agile.Data.Oracle.SqlMap;
 using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 
 namespace Agile.Data.Oracle
@@ -88,7 +90,7 @@ namespace Agile.Data.Oracle
         /// <typeparam name="T"></typeparam>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        bool Delete<T>(object predicate ) where T : class;
+        bool Delete<T>(object predicate) where T : class;
         #endregion
 
         #region count
@@ -161,14 +163,40 @@ namespace Agile.Data.Oracle
         IMultipleResultReader GetMultiple(MultiplePredicate predicate);
         #endregion
 
-        #region sqlcommand
+        #region SQLCommand   SQLMap
         /// <summary>
         /// 执行sql语句，返回影响行数
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        int ExecuteCommad(string sql, dynamic param = null);
+        int ExecuteSql(string sql, dynamic param = null);
+
+        /// <summary>
+        /// 执行sqlmap sql语句，返回影响行数
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        int ExecuteBySqlMap(SQLMapConfig config);
+
+
+        /// <summary>
+        /// 执行sql语句，返回第一行第一列
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        object ExecuteScalar(string sql, dynamic param = null);
+
+
+        /// <summary>
+        /// 执行sql语句，返回第一行第一列
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        T ExecuteScalar<T>(string sql, dynamic param = null);
+
 
         /// <summary>
         /// 执行sql语句，查询单个实体
@@ -177,7 +205,15 @@ namespace Agile.Data.Oracle
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        T ExecuteQuerySingle<T>(string sql, dynamic param = null) where T : class;
+        T ExecuteSingle<T>(string sql, dynamic param = null) where T : class;
+
+        /// <summary>
+        /// 执行sqlmap sql语句，查询单个实体
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        T ExecuteSingleBySqlMap<T>(SQLMapConfig config) where T : class;
 
         /// <summary>
         /// 执行sql语句，查询实体集合
@@ -187,7 +223,15 @@ namespace Agile.Data.Oracle
         /// <param name="param"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecuteQueryList<T>(string sql, dynamic param = null, bool buffered = false) where T : class;
+        IEnumerable<T> ExecuteList<T>(string sql, dynamic param = null, bool buffered = false) where T : class;
+
+        /// <summary>
+        /// 执行sqlmap sql语句，查询实体集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        IEnumerable<T> ExecuteListBySqlMap<T>(SQLMapConfig config) where T : class;
 
         /// <summary>
         /// 执行sql语句，查询分页实体集合
@@ -199,7 +243,16 @@ namespace Agile.Data.Oracle
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecuteQueryList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class;
+        IEnumerable<T> ExecutePageList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class;
+
+        /// <summary>
+        /// 执行sqlmap sql语句，查询分页实体集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        IEnumerable<T> ExecutePageListBySqlMap<T>(SQLMapConfig config) where T : class;
+
 
         /// <summary>
         /// 执行sql语句，查询datatable
@@ -207,7 +260,14 @@ namespace Agile.Data.Oracle
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        DataTable ExecuteQueryDataTable(string sql, dynamic param = null);
+        DataTable ExecuteDataTable(string sql, dynamic param = null);
+
+        /// <summary>
+        /// 执行sqlmap sql语句，查询datatable
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        DataTable ExecuteDataTableBySqlMap(SQLMapConfig config);
 
         /// <summary>
         /// 执行sql语句，查询分页datatable
@@ -218,24 +278,18 @@ namespace Agile.Data.Oracle
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        DataTable ExecuteQueryDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null);
+        DataTable ExecutePageDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null);
 
         /// <summary>
-        /// 执行sql语句，返回第一行第一列
+        /// 执行sqlmap sql语句，查询分页datatable
         /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
+        /// <param name="config"></param>
         /// <returns></returns>
-        object ExecuteScalar(string sql, dynamic param = null);
+        DataTable ExecutePageDataTableBySqlMap(SQLMapConfig config);
+        #endregion
 
-        /// <summary>
-        /// 执行sql语句，返回第一行第一列
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        T ExecuteScalar<T>(string sql, dynamic param = null);
 
+        #region 存储过程
         /// <summary>
         /// 执行存储过程
         /// </summary>
@@ -252,7 +306,6 @@ namespace Agile.Data.Oracle
         /// <param name="param"></param>
         /// <returns></returns>
         IEnumerable<T> ExecuteProc<T>(string procName, dynamic param) where T : class;
-
         #endregion
     }
 
@@ -535,17 +588,55 @@ namespace Agile.Data.Oracle
 
 
 
-        #region 直接执行sql语句
+        #region SQLCommand   SQLMap
         /// <summary>
         /// 执行sql语句
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public int ExecuteCommad(string sql, dynamic param = null)
+        public int ExecuteSql(string sql, dynamic param = null)
         {
             DebugSql(sql, param);
             return Connection.Execute(sql, param as object, Transaction);
+        }
+
+        /// <summary>
+        /// 执行sqlmap sql语句，返回影响行数
+        /// </summary>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public int ExecuteBySqlMap(SQLMapConfig config)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            return ExecuteSql(cmd.TransferedSQL, config.Parameters);
+        }
+
+
+        /// <summary>
+        /// 执行sql语句，返回第一行第一列
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public object ExecuteScalar(string sql, dynamic param = null)
+        {
+            DebugSql(sql, param);
+            return Connection.ExecuteScalar(sql, param as object, Transaction);
+        }
+
+
+        /// <summary>
+        /// 执行SQL语句，返回查询结果
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public T ExecuteScalar<T>(string sql, dynamic param = null)
+        {
+            DebugSql(sql, param);
+            return Connection.ExecuteScalar<T>(sql, param as object, Transaction);
         }
 
 
@@ -556,13 +647,24 @@ namespace Agile.Data.Oracle
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public T ExecuteQuerySingle<T>(string sql, dynamic param = null) where T : class
+        public T ExecuteSingle<T>(string sql, dynamic param = null) where T : class
         {
             DebugSql(sql, param);
             return Connection.QuerySingle<T>(sql, param as object, Transaction);
         }
 
-
+        /// <summary>
+        /// 执行sqlmap sql语句，查询单个实体
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public T ExecuteSingleBySqlMap<T>(SQLMapConfig config) where T : class
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            return ExecuteSingle<T>(cmd.TransferedSQL, config.Parameters);
+        }
 
         /// <summary>
         /// 执行sql语句 根据条件筛选数据集合
@@ -571,12 +673,24 @@ namespace Agile.Data.Oracle
         /// <param name="param"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecuteQueryList<T>(string sql, dynamic param = null, bool buffered = false) where T : class
+        public IEnumerable<T> ExecuteList<T>(string sql, dynamic param = null, bool buffered = false) where T : class
         {
             DebugSql(sql, param);
             return Connection.Query<T>(sql, param as object, Transaction, buffered);
         }
 
+        /// <summary>
+        /// 执行sqlmap sql语句，查询实体集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public IEnumerable<T> ExecuteListBySqlMap<T>(SQLMapConfig config) where T : class
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            return ExecuteList<T>(cmd.TransferedSQL, config.Parameters);
+        }
 
         /// <summary>
         /// 执行sql语句 根据条件筛选数据集合（分页）
@@ -588,7 +702,7 @@ namespace Agile.Data.Oracle
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecuteQueryList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class
+        public IEnumerable<T> ExecutePageList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class
         {
             while (sql.Contains("\r\n"))
             {
@@ -612,13 +726,7 @@ namespace Agile.Data.Oracle
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
 
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(pageSql, param);
-            }
-
             string allRowsCountSql = DapperExtensions.Instance.SqlGenerator.PageCount(sql);
-
             DebugSql(pageSql, dynamicParameters);
             IEnumerable<T> list = Connection.Query<T>(pageSql, dynamicParameters, Transaction, true);
 
@@ -627,6 +735,21 @@ namespace Agile.Data.Oracle
             return list;
         }
 
+        /// <summary>
+        /// 执行sqlmap sql语句，查询分页实体集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public IEnumerable<T> ExecutePageListBySqlMap<T>(SQLMapConfig config) where T : class
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            int allRowsCount = 0;
+            var list = ExecutePageList<T>(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
+            config.AllRowsCount = allRowsCount;
+            return list;
+        }
 
         /// <summary>
         /// 执行sql语句 根据条件筛选数据集合（返回DataTable）
@@ -634,7 +757,7 @@ namespace Agile.Data.Oracle
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public DataTable ExecuteQueryDataTable(string sql, dynamic param = null)
+        public DataTable ExecuteDataTable(string sql, dynamic param = null)
         {
             DebugSql(sql, param);
             var dReader = Connection.ExecuteReader(sql, param as object, Transaction);
@@ -643,6 +766,18 @@ namespace Agile.Data.Oracle
             return DataReadToDataTable(dReader);
         }
 
+        /// <summary>
+        /// 执行sqlmap sql语句，查询datatable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public DataTable ExecuteDataTableBySqlMap(SQLMapConfig config)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            return ExecuteDataTable(cmd.TransferedSQL, config.Parameters);
+        }
 
         /// <summary>
         /// 执行sql语句 根据条件筛选数据集合（返回分页DataTable）
@@ -653,7 +788,7 @@ namespace Agile.Data.Oracle
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public DataTable ExecuteQueryDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null)
+        public DataTable ExecutePageDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null)
         {
             while (sql.Contains("\r\n"))
             {
@@ -675,13 +810,7 @@ namespace Agile.Data.Oracle
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
 
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(pageSql, param);
-            }
-
             string allRowsCountSql = DapperExtensions.Instance.SqlGenerator.PageCount(sql);
-
             DebugSql(pageSql, dynamicParameters);
             var dReader = Connection.ExecuteReader(pageSql, dynamicParameters, Transaction);
 
@@ -692,6 +821,26 @@ namespace Agile.Data.Oracle
             return DataReadToDataTable(dReader);
         }
 
+
+        /// <summary>
+        /// 执行sqlmap sql语句，查询分页datatable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="config"></param>
+        /// <returns></returns>
+        public DataTable ExecutePageDataTableBySqlMap(SQLMapConfig config)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            int allRowsCount = 0;
+            var datatable = ExecutePageDataTable(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
+            config.AllRowsCount = allRowsCount;
+            return datatable;
+        }
+        #endregion
+
+
+        #region 存储过程
         /// <summary>
         /// 执行存储过程
         /// </summary>
@@ -717,34 +866,9 @@ namespace Agile.Data.Oracle
             IEnumerable<T> list = Connection.Query<T>(procName, param as object, Transaction, false, null, CommandType.StoredProcedure);
             return list;
         }
+        #endregion
 
-
-        /// <summary>
-        /// 执行SQL语句，返回查询结果
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public object ExecuteScalar(string sql, dynamic param = null)
-        {
-            DebugSql(sql, param);
-            return Connection.ExecuteScalar(sql, param as object, Transaction);
-        }
-
-
-        /// <summary>
-        /// 执行SQL语句，返回查询结果
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public T ExecuteScalar<T>(string sql, dynamic param = null)
-        {
-            DebugSql(sql, param);
-            return Connection.ExecuteScalar<T>(sql, param as object, Transaction);
-        }
-
-
+        #region helper
 
         /// <summary>
         /// datareader 转 datatable
@@ -755,32 +879,42 @@ namespace Agile.Data.Oracle
         {
             lock (lockObj)
             {
-                DataTable dt = new DataTable();
-                bool init = false;
-                dt.BeginLoadData();
-                object[] vals = new object[0];
-                while (dReader.Read())
+                try
                 {
-                    if (!init)
+                    DataTable dt = new DataTable();
+                    bool init = false;
+                    dt.BeginLoadData();
+                    object[] vals = new object[0];
+                    while (dReader.Read())
                     {
-                        init = true;
-                        int fieldCount = dReader.FieldCount;
-                        for (int i = 0; i < fieldCount; i++)
+                        if (!init)
                         {
-                            dt.Columns.Add(dReader.GetName(i), dReader.GetFieldType(i));
+                            init = true;
+                            int fieldCount = dReader.FieldCount;
+                            for (int i = 0; i < fieldCount; i++)
+                            {
+                                dt.Columns.Add(dReader.GetName(i), dReader.GetFieldType(i));
+                            }
+                            vals = new object[fieldCount];
                         }
-                        vals = new object[fieldCount];
+                        dReader.GetValues(vals);
+                        dt.LoadDataRow(vals, true);
                     }
-                    dReader.GetValues(vals);
-                    dt.LoadDataRow(vals, true);
+                    dReader.Close();
+                    dt.EndLoadData();
+                    return dt;
                 }
-                dReader.Close();
-                dt.EndLoadData();
-                return dt;
+                catch (Exception ex)
+                {
+                    throw new Exception($"DataReadToDataTable异常：{ex.Message}");
+                }
+                finally
+                {
+                    if (!dReader.IsClosed)
+                        dReader.Close();
+                }
             }
         }
-        #endregion
-
 
 
         /// <summary>
@@ -795,5 +929,6 @@ namespace Agile.Data.Oracle
                 DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
             }
         }
+        #endregion
     }
 }

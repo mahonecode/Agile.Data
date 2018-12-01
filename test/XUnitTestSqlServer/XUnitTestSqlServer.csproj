@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Agile.Data.SqlServer\Agile.Data.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\Agile.Data.SqlServer\Agile.Data.SqlServer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

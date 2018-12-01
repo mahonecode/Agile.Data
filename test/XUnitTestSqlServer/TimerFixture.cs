@@ -1,4 +1,5 @@
 ﻿using Agile.Data.SqlServer;
+using Agile.Data.SqlServer.SqlMap;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -264,13 +265,13 @@ namespace XUnitTestSqlServer
                 var fileName = "AgileSqlMap.xml";
                 var filePath = $"{Path.Combine(Environment.CurrentDirectory, "SqlMap")}{Path.DirectorySeparatorChar}{fileName}";
 
-                NameValueCollection collection = new NameValueCollection();
+                Dictionary<string,object> collection = new Dictionary<string, object>();
                 collection.Add("Name", "Foo");
                 var cmd = SQLMapHelper.GetByCode(filePath, "test4", collection);
                 string sql = cmd.TransferedSQL;
 
                 dynamic param = new { Name = "Foo" };
-                var a = Base.agileClient.DBSession.ExecuteQuerySingle<Animal>(sql, param);
+                var a = Base.agileClient.DBSession.ExecuteSingle<Animal>(sql, param);
                 Assert.Equal(a1.Id, a.Id);
             }
         }
