@@ -71,13 +71,14 @@ namespace Agile.Data.MySql.SqlMap
                 }
             }
             commandInfo.ConfigSQL = commandInfo.ConfigSQL + sbWhere.ToString();
-            commandInfo.TransferedSQL = ParseSqlTransact(commandInfo.ConfigSQL, parameterPrefix);
+            commandInfo.TransferedSQL = ParseSqlReplace(ParseSqlTransact(commandInfo.ConfigSQL, parameterPrefix), parameter);
 
             return commandInfo;
         }
 
 
         /// <summary>
+        /// 参数化查询
         /// 脚本解析
         /// select * from Animal where Name=#{Name} and Age=#{Age}
         /// 解析成
@@ -116,17 +117,22 @@ namespace Agile.Data.MySql.SqlMap
 
         /// <summary>
         /// Replace properties by their values in the given string
+        /// 非参数化查询，针对in的情况，做参数值文本替换拼接sql
+        /// 脚本解析
+        /// select * from Animal where Name in(${Name})
+        /// 解析成
+        /// select * from Animal where Name in('name1Value','name2Value','name3Value')
         /// </summary>
-        /// <param name="str"></param>
-        /// <param name="properties"></param>
+        /// <param name="sqlcmd"></param>
+        /// <param name="parameter"></param>
         /// <returns></returns>
-        private static string ParseSqlReplace(string str, NameValueCollection properties)
+        private static string ParseSqlReplace(string sqlcmd, Dictionary<string, object> parameter)
         {
-            string OPEN = "#{";
+            string OPEN = "${";
             string CLOSE = "}";
 
-            string newString = str;
-            if (newString != null && properties != null)
+            string newString = sqlcmd;
+            if (newString != null && parameter != null && parameter.Count > 0)
             {
                 int start = newString.IndexOf(OPEN);
                 int end = newString.IndexOf(CLOSE);
@@ -138,14 +144,13 @@ namespace Agile.Data.MySql.SqlMap
 
                     int index = start + OPEN.Length;
                     string propName = newString.Substring(index, end - index);
-                    string propValue = properties.Get(propName);
-                    if (propValue == null)
+                    if (parameter.ContainsKey(propName))
                     {
-                        newString = prepend + propName + append;
+                        newString = prepend + parameter[propName] + append;
                     }
                     else
                     {
-                        newString = prepend + propValue + append;
+                        newString = prepend + propName + append;
                     }
                     start = newString.IndexOf(OPEN);
                     end = newString.IndexOf(CLOSE);
