@@ -177,7 +177,7 @@ namespace Agile.Data.SqlServer
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        int ExecuteBySqlMap(SQLMapConfig config);
+        int ExecuteSql(SQLMapConfig config);
 
 
         /// <summary>
@@ -199,21 +199,86 @@ namespace Agile.Data.SqlServer
 
 
         /// <summary>
-        /// 执行sql语句，查询单个实体
+        /// 执行sql语句 执行查询并映射第一个结果
+        /// First           没有项:抛异常 有一项:当前项 有多项:第一项
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        T ExecuteSingle<T>(string sql, dynamic param = null) where T : class;
+        T QueryFirst<T>(string sql, dynamic param = null);
 
         /// <summary>
-        /// 执行sqlmap sql语句，查询单个实体
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列不包含任何元素则为默认值
+        /// FirstOrDefault  没有项:默认值 有一项:当前项 有多项:第一项
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="config"></param>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        T ExecuteSingleBySqlMap<T>(SQLMapConfig config) where T : class;
+        T QueryFirstOrDefault<T>(string sql, dynamic param = null);
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列中没有元素则会引发异常
+        /// Single          没有项:抛异常 有一项:当前项 有多项:抛异常
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        T QuerySingle<T>(string sql, dynamic param = null);
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列为空则为默认值。如果序列中有多个元素，则此方法将引发异常
+        /// SingleOrDefault 没有项:默认值 有一项:当前项 有多项:抛异常
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        T QuerySingleOrDefault<T>(string sql, dynamic param = null);
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果
+        /// First           没有项:抛异常 有一项:当前项 有多项:第一项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        T QueryFirst<T>(SQLMapConfig config);
+
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列不包含任何元素则为默认值
+        /// FirstOrDefault  没有项:默认值 有一项:当前项 有多项:第一项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        T QueryFirstOrDefault<T>(SQLMapConfig config);
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列中没有元素则会引发异常
+        /// Single          没有项:抛异常 有一项:当前项 有多项:抛异常
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        T QuerySingle<T>(SQLMapConfig config);
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列为空则为默认值。如果序列中有多个元素，则此方法将引发异常
+        /// SingleOrDefault 没有项:默认值 有一项:当前项 有多项:抛异常
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        T QuerySingleOrDefault<T>(SQLMapConfig config);
+
 
         /// <summary>
         /// 执行sql语句，查询实体集合
@@ -223,7 +288,7 @@ namespace Agile.Data.SqlServer
         /// <param name="param"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecuteList<T>(string sql, dynamic param = null, bool buffered = false) where T : class;
+        IEnumerable<T> QueryList<T>(string sql, dynamic param = null, bool buffered = false);
 
         /// <summary>
         /// 执行sqlmap sql语句，查询实体集合
@@ -231,7 +296,7 @@ namespace Agile.Data.SqlServer
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecuteListBySqlMap<T>(SQLMapConfig config) where T : class;
+        IEnumerable<T> QueryList<T>(SQLMapConfig config);
 
         /// <summary>
         /// 执行sql语句，查询分页实体集合
@@ -243,7 +308,7 @@ namespace Agile.Data.SqlServer
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecutePageList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class;
+        IEnumerable<T> QueryPageList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null);
 
         /// <summary>
         /// 执行sqlmap sql语句，查询分页实体集合
@@ -251,7 +316,7 @@ namespace Agile.Data.SqlServer
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecutePageListBySqlMap<T>(SQLMapConfig config) where T : class;
+        IEnumerable<T> QueryPageList<T>(SQLMapConfig config);
 
 
         /// <summary>
@@ -260,14 +325,14 @@ namespace Agile.Data.SqlServer
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        DataTable ExecuteDataTable(string sql, dynamic param = null);
+        DataTable QueryDataTable(string sql, dynamic param = null);
 
         /// <summary>
         /// 执行sqlmap sql语句，查询datatable
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        DataTable ExecuteDataTableBySqlMap(SQLMapConfig config);
+        DataTable QueryDataTable(SQLMapConfig config);
 
         /// <summary>
         /// 执行sql语句，查询分页datatable
@@ -278,14 +343,14 @@ namespace Agile.Data.SqlServer
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        DataTable ExecutePageDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null);
+        DataTable QueryPageDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null);
 
         /// <summary>
         /// 执行sqlmap sql语句，查询分页datatable
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        DataTable ExecutePageDataTableBySqlMap(SQLMapConfig config);
+        DataTable QueryPageDataTable(SQLMapConfig config);
         #endregion
 
 
@@ -296,7 +361,7 @@ namespace Agile.Data.SqlServer
         /// <param name="procName"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        int ExecuteProc(string procName, dynamic param = null);
+        int ExecuteProcedure(string procName, dynamic param = null);
 
         /// <summary>
         /// 执行存储过程
@@ -305,7 +370,7 @@ namespace Agile.Data.SqlServer
         /// <param name="procName"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        IEnumerable<T> ExecuteProc<T>(string procName, dynamic param) where T : class;
+        IEnumerable<T> ExecuteProcedure<T>(string procName, dynamic param);
         #endregion
     }
 
@@ -606,7 +671,7 @@ namespace Agile.Data.SqlServer
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        public int ExecuteBySqlMap(SQLMapConfig config)
+        public int ExecuteSql(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
@@ -641,55 +706,154 @@ namespace Agile.Data.SqlServer
 
 
         /// <summary>
-        /// 执行sql语句 根据条件筛选出数据集合
+        /// 执行sql语句 执行查询并映射第一个结果
+        /// First           没有项:抛异常 有一项:当前项 有多项:第一项
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public T ExecuteSingle<T>(string sql, dynamic param = null) where T : class
+        public T QueryFirst<T>(string sql, dynamic param = null)
+        {
+            DebugSql(sql, param);
+            return Connection.QueryFirst<T>(sql, param as object, Transaction);
+        }
+
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列不包含任何元素则为默认值
+        /// FirstOrDefault  没有项:默认值 有一项:当前项 有多项:第一项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public T QueryFirstOrDefault<T>(string sql, dynamic param = null)
+        {
+            DebugSql(sql, param);
+            return Connection.QueryFirstOrDefault<T>(sql, param as object, Transaction);
+        }
+
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列中没有元素则会引发异常
+        /// Single          没有项:抛异常 有一项:当前项 有多项:抛异常
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public T QuerySingle<T>(string sql, dynamic param = null)
         {
             DebugSql(sql, param);
             return Connection.QuerySingle<T>(sql, param as object, Transaction);
         }
 
+
         /// <summary>
-        /// 执行sqlmap sql语句，查询单个实体
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列为空则为默认值。如果序列中有多个元素，则此方法将引发异常
+        /// SingleOrDefault 没有项:默认值 有一项:当前项 有多项:抛异常
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="config"></param>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
         /// <returns></returns>
-        public T ExecuteSingleBySqlMap<T>(SQLMapConfig config) where T : class
+        public T QuerySingleOrDefault<T>(string sql, dynamic param = null)
+        {
+            DebugSql(sql, param);
+            return Connection.QuerySingleOrDefault<T>(sql, param as object, Transaction);
+        }
+
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果
+        /// First           没有项:抛异常 有一项:当前项 有多项:第一项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public T QueryFirst<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
-            return ExecuteSingle<T>(cmd.TransferedSQL, config.Parameters);
+            return QueryFirst<T>(cmd.TransferedSQL, config.Parameters);
         }
 
+
         /// <summary>
-        /// 执行sql语句 根据条件筛选数据集合
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列不包含任何元素则为默认值
+        /// FirstOrDefault  没有项:默认值 有一项:当前项 有多项:第一项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public T QueryFirstOrDefault<T>(SQLMapConfig config)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            return QueryFirstOrDefault<T>(cmd.TransferedSQL, config.Parameters);
+        }
+
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列中没有元素则会引发异常
+        /// Single          没有项:抛异常 有一项:当前项 有多项:抛异常
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public T QuerySingle<T>(SQLMapConfig config)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            return QuerySingle<T>(cmd.TransferedSQL, config.Parameters);
+        }
+
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射第一个结果，如果序列为空则为默认值。如果序列中有多个元素，则此方法将引发异常
+        /// SingleOrDefault 没有项:默认值 有一项:当前项 有多项:抛异常
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        public T QuerySingleOrDefault<T>(SQLMapConfig config)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            return QuerySingleOrDefault<T>(cmd.TransferedSQL, config.Parameters);
+        }
+
+
+
+        /// <summary>
+        /// 执行sql语句 执行查询并映射结果 根据条件筛选数据集合
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecuteList<T>(string sql, dynamic param = null, bool buffered = false) where T : class
+        public IEnumerable<T> QueryList<T>(string sql, dynamic param = null, bool buffered = false)
         {
             DebugSql(sql, param);
             return Connection.Query<T>(sql, param as object, Transaction, buffered);
         }
 
         /// <summary>
-        /// 执行sqlmap sql语句，查询实体集合
+        /// 执行sqlmap sql语句，执行查询并映射结果 根据条件筛选数据集合
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecuteListBySqlMap<T>(SQLMapConfig config) where T : class
+        public IEnumerable<T> QueryList<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
-            return ExecuteList<T>(cmd.TransferedSQL, config.Parameters);
+            return QueryList<T>(cmd.TransferedSQL, config.Parameters);
         }
 
         /// <summary>
@@ -702,7 +866,7 @@ namespace Agile.Data.SqlServer
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecutePageList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null) where T : class
+        public IEnumerable<T> QueryPageList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null)
         {
             while (sql.Contains("\r\n"))
             {
@@ -741,12 +905,12 @@ namespace Agile.Data.SqlServer
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecutePageListBySqlMap<T>(SQLMapConfig config) where T : class
+        public IEnumerable<T> QueryPageList<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             int allRowsCount = 0;
-            var list = ExecutePageList<T>(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
+            var list = QueryPageList<T>(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
             config.AllRowsCount = allRowsCount;
             return list;
         }
@@ -757,7 +921,7 @@ namespace Agile.Data.SqlServer
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public DataTable ExecuteDataTable(string sql, dynamic param = null)
+        public DataTable QueryDataTable(string sql, dynamic param = null)
         {
             DebugSql(sql, param);
             var dReader = Connection.ExecuteReader(sql, param as object, Transaction);
@@ -772,11 +936,11 @@ namespace Agile.Data.SqlServer
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <returns></returns>
-        public DataTable ExecuteDataTableBySqlMap(SQLMapConfig config)
+        public DataTable QueryDataTable(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
-            return ExecuteDataTable(cmd.TransferedSQL, config.Parameters);
+            return QueryDataTable(cmd.TransferedSQL, config.Parameters);
         }
 
         /// <summary>
@@ -788,7 +952,7 @@ namespace Agile.Data.SqlServer
         /// <param name="allRowsCount"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public DataTable ExecutePageDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null)
+        public DataTable QueryPageDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null)
         {
             while (sql.Contains("\r\n"))
             {
@@ -828,12 +992,12 @@ namespace Agile.Data.SqlServer
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <returns></returns>
-        public DataTable ExecutePageDataTableBySqlMap(SQLMapConfig config)
+        public DataTable QueryPageDataTable(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             int allRowsCount = 0;
-            var datatable = ExecutePageDataTable(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
+            var datatable = QueryPageDataTable(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
             config.AllRowsCount = allRowsCount;
             return datatable;
         }
@@ -847,7 +1011,7 @@ namespace Agile.Data.SqlServer
         /// <param name="procName"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public int ExecuteProc(string procName, dynamic param = null)
+        public int ExecuteProcedure(string procName, dynamic param = null)
         {
             DebugSql(procName, param);
             return Connection.Execute(procName, param as object, Transaction, null, CommandType.StoredProcedure);
@@ -860,7 +1024,7 @@ namespace Agile.Data.SqlServer
         /// <param name="procName"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        public IEnumerable<T> ExecuteProc<T>(string procName, dynamic param) where T : class
+        public IEnumerable<T> ExecuteProcedure<T>(string procName, dynamic param)
         {
             DebugSql(procName, param);
             IEnumerable<T> list = Connection.Query<T>(procName, param as object, Transaction, false, null, CommandType.StoredProcedure);

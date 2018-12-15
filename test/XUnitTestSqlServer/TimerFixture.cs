@@ -271,7 +271,7 @@ namespace XUnitTestSqlServer
                 string sql = cmd.TransferedSQL;
 
                 dynamic param = new { Name = "Foo" };
-                var a = Base.agileClient.DBSession.ExecuteSingle<Animal>(sql, param);
+                var a = Base.agileClient.DBSession.QueryFirstOrDefault<Animal>(sql, param);
                 Assert.Equal(a1.Id, a.Id);
             }
         }
