@@ -674,6 +674,8 @@ namespace Agile.Data
         public int ExecuteSql(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             return ExecuteSql(cmd.TransferedSQL, config.Parameters);
         }
@@ -776,6 +778,8 @@ namespace Agile.Data
         public T QueryFirst<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             return QueryFirst<T>(cmd.TransferedSQL, config.Parameters);
         }
@@ -792,6 +796,8 @@ namespace Agile.Data
         public T QueryFirstOrDefault<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             return QueryFirstOrDefault<T>(cmd.TransferedSQL, config.Parameters);
         }
@@ -808,6 +814,8 @@ namespace Agile.Data
         public T QuerySingle<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             return QuerySingle<T>(cmd.TransferedSQL, config.Parameters);
         }
@@ -824,6 +832,8 @@ namespace Agile.Data
         public T QuerySingleOrDefault<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             return QuerySingleOrDefault<T>(cmd.TransferedSQL, config.Parameters);
         }
@@ -852,6 +862,8 @@ namespace Agile.Data
         public IEnumerable<T> QueryList<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             return QueryList<T>(cmd.TransferedSQL, config.Parameters);
         }
@@ -868,14 +880,6 @@ namespace Agile.Data
         /// <returns></returns>
         public IEnumerable<T> QueryPageList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null)
         {
-            while (sql.Contains("\r\n"))
-            {
-                sql = sql.Replace("\r\n", " ");
-            }
-            while (sql.Contains("  "))
-            {
-                sql = sql.Replace("  ", " ");
-            }
             Dictionary<string, object> parameters = new Dictionary<string, object>();
 
             var pageSql = DapperExtensions.SqlDialect.GetPagingSql(sql, pageIndex, pageSize, parameters);
@@ -883,7 +887,7 @@ namespace Agile.Data
             DynamicParameters dynamicParameters = new DynamicParameters();
             if (param != null)
             {
-                dynamicParameters = param as DynamicParameters;
+                dynamicParameters = new DynamicParameters(param);
             }
             foreach (var parameter in parameters)
             {
@@ -908,6 +912,8 @@ namespace Agile.Data
         public IEnumerable<T> QueryPageList<T>(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             int allRowsCount = 0;
             var list = QueryPageList<T>(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
@@ -939,6 +945,8 @@ namespace Agile.Data
         public DataTable QueryDataTable(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             return QueryDataTable(cmd.TransferedSQL, config.Parameters);
         }
@@ -954,20 +962,12 @@ namespace Agile.Data
         /// <returns></returns>
         public DataTable QueryPageDataTable(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null)
         {
-            while (sql.Contains("\r\n"))
-            {
-                sql = sql.Replace("\r\n", " ");
-            }
-            while (sql.Contains("  "))
-            {
-                sql = sql.Replace("  ", " ");
-            }
             Dictionary<string, object> parameters = new Dictionary<string, object>();
             var pageSql = DapperExtensions.SqlDialect.GetPagingSql(sql, pageIndex, pageSize, parameters);
             DynamicParameters dynamicParameters = new DynamicParameters();
             if (param != null)
             {
-                dynamicParameters = param as DynamicParameters;
+                dynamicParameters = new DynamicParameters(param);
             }
             foreach (var parameter in parameters)
             {
@@ -995,6 +995,8 @@ namespace Agile.Data
         public DataTable QueryPageDataTable(SQLMapConfig config)
         {
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
+            if (!File.Exists(filePath))
+                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
             var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
             int allRowsCount = 0;
             var datatable = QueryPageDataTable(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
