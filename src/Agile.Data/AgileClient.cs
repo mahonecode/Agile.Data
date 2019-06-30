@@ -2,7 +2,6 @@
 using MySql.Data.MySqlClient;
 using Oracle.ManagedDataAccess.Client;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -10,34 +9,12 @@ namespace Agile.Data
 {
     public class AgileClient
     {
-        public ConnectionConfig CurrentConnectionConfig { get; set; }
+        private ConnectionConfig CurrentConnectionConfig { get; set; }
 
-        #region Constructor
         public AgileClient(ConnectionConfig config)
         {
             this.CurrentConnectionConfig = config;
-            switch (config.DbType)
-            {
-                case DbType.MySql:
-                    DapperExtensions.SqlDialect = new MySqlDialect();
-                    break;
-                case DbType.SqlServer:
-                    DapperExtensions.SqlDialect = new SqlServerDialect();
-                    break;
-                case DbType.Oracle:
-                    DapperExtensions.SqlDialect = new OracleDialect();
-                    break;
-                case DbType.Sqlite:
-                    DapperExtensions.SqlDialect = new SqliteDialect();
-                    break;
-                case DbType.PostgreSQL:
-                    throw new Exception("开发中");
-                default:
-                    throw new Exception("ConnectionConfig.DbType is null");
-            }
         }
-        #endregion
-
 
         /// <summary>
         /// 通用数据库访问类实例
@@ -46,10 +23,9 @@ namespace Agile.Data
         {
             get
             {
-                return CreateSession();
+                return this.CreateSession();
             }
         }
-
 
         /// <summary>
         /// 创建数据库连接
@@ -60,20 +36,22 @@ namespace Agile.Data
             IDbConnection conn;
             switch (CurrentConnectionConfig.DbType)
             {
-                case DbType.MySql:
+                case DatabaseType.MySql:
+                    DapperExtensions.SqlDialect = new MySqlDialect();
                     conn = new MySqlConnection(CurrentConnectionConfig.ConnectionString);
                     break;
-                case DbType.SqlServer:
+                case DatabaseType.SqlServer:
+                    DapperExtensions.SqlDialect = new SqlServerDialect();
                     conn = new SqlConnection(CurrentConnectionConfig.ConnectionString);
                     break;
-                case DbType.Oracle:
+                case DatabaseType.Oracle:
+                    DapperExtensions.SqlDialect = new OracleDialect();
                     conn = new OracleConnection(CurrentConnectionConfig.ConnectionString);
                     break;
-                case DbType.Sqlite:
-                    conn = new SqlConnection(CurrentConnectionConfig.ConnectionString);
-                    break;
-                case DbType.PostgreSQL:
-                    throw new Exception("开发中");
+                case DatabaseType.Sqlite:
+                    throw new Exception("Sqlite 暂不支持");
+                case DatabaseType.PostgreSQL:
+                    throw new Exception("PostgreSQL 暂不支持");
                 default:
                     throw new Exception("ConnectionConfig.DbType is null");
             }
@@ -83,7 +61,7 @@ namespace Agile.Data
                 throw new Exception("数据库连接创建失败");
             }
 
-            //dapper手动打开的话会保持长连接，dapper底层不关闭
+            //dapper手动打开的话会保持长连接，dapper底层不关闭，需要手动关闭
             //否则每次操作之后dapper底层会自动关闭连接
             if (conn.State == ConnectionState.Closed)
             {
@@ -103,8 +81,7 @@ namespace Agile.Data
         /// <returns></returns>
         public IDbSession CreateSession()
         {
-            IDbConnection conn = CreateDbConnection();
-            IDbSession session = new DbSession(conn);
+            IDbSession session = new DbSession(this.CreateDbConnection());
             return session;
         }
 
@@ -121,10 +98,14 @@ namespace Agile.Data
         }
 
 
-        #region Transaction
+        #region Transaction 数据库事务操作封装
+        /// <summary>
+        /// 事务操作无返回值
+        /// </summary>
+        /// <param name="action"></param>
         public void RunInTransaction(Action<IDbSession> action)
         {
-            IDbSession session = CreateSession();
+            IDbSession session = this.CreateSession();
             try
             {
                 session.BeginTrans();
@@ -137,7 +118,7 @@ namespace Agile.Data
                     session.Commit();
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 if (session.Transaction != null)
                 {
@@ -152,9 +133,15 @@ namespace Agile.Data
             }
         }
 
+        /// <summary>
+        /// 事务操作有返回值
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="func"></param>
+        /// <returns></returns>
         public T RunInTransaction<T>(Func<IDbSession, T> func)
         {
-            IDbSession session = CreateSession();
+            IDbSession session = this.CreateSession();
             try
             {
                 session.BeginTrans();
@@ -168,7 +155,7 @@ namespace Agile.Data
                 }
                 return result;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 if (session.Transaction != null)
                 {
@@ -183,7 +170,9 @@ namespace Agile.Data
         }
         #endregion
 
-
+        /// <summary>
+        /// 是否开启脚本日志
+        /// </summary>
         public bool IsEnableLogEvent
         {
             get

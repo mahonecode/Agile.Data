@@ -100,7 +100,7 @@ namespace Agile.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        int Count<T>(object predicate) where T : class;
+        int Count<T>(object predicate = null) where T : class;
         #endregion
 
         #region get
@@ -122,7 +122,7 @@ namespace Agile.Data
         /// <param name="sort"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        IEnumerable<T> GetList<T>(object predicate = null, IList<ISort> sort = null, bool buffered = false) where T : class;
+        IEnumerable<T> GetList<T>(object predicate = null, IList<ISort> sort = null, bool buffered = true) where T : class;
         #endregion
 
         #region getpage
@@ -137,7 +137,7 @@ namespace Agile.Data
         /// <param name="sort"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        IEnumerable<T> GetPageList<T>(int pageIndex, int pageSize, out int allRowsCount, object predictate = null, IList<ISort> sort = null, bool buffered = false) where T : class;
+        IEnumerable<T> GetPageList<T>(int pageIndex, int pageSize, out int allRowsCount, object predictate = null, IList<ISort> sort = null, bool buffered = true) where T : class;
         #endregion
 
         #region getpagedata
@@ -151,7 +151,7 @@ namespace Agile.Data
         /// <param name="sort"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        //PageData<T> GetPageData<T>(int pageIndex = 1, int pageSize = 10, object predicate = null, IList<ISort> sort = null, bool buffered = false) where T : class;
+        //PageData<T> GetPageData<T>(int pageIndex = 1, int pageSize = 10, object predicate = null, IList<ISort> sort = null, bool buffered = true) where T : class;
         #endregion
 
         #region GetMultiple
@@ -286,9 +286,9 @@ namespace Agile.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
         /// <param name="param"></param>
-        /// <param name="buffered"></param>
+        /// <param name="buffered">缓冲</param>
         /// <returns></returns>
-        IEnumerable<T> QueryList<T>(string sql, dynamic param = null, bool buffered = false);
+        IEnumerable<T> QueryList<T>(string sql, dynamic param = null, bool buffered = true);
 
         /// <summary>
         /// 执行sqlmap sql语句，查询实体集合
@@ -299,7 +299,7 @@ namespace Agile.Data
         IEnumerable<T> QueryList<T>(SQLMapConfig config);
 
         /// <summary>
-        /// 执行sql语句，查询分页实体集合
+        /// 执行sql语句，查询分页实体集合,pageindex计数从0开始
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
@@ -311,7 +311,7 @@ namespace Agile.Data
         IEnumerable<T> QueryPageList<T>(string sql, int pageIndex, int pageSize, out int allRowsCount, dynamic param = null);
 
         /// <summary>
-        /// 执行sqlmap sql语句，查询分页实体集合
+        /// 执行sqlmap sql语句，查询分页实体集合,pageindex计数从0开始
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
@@ -335,7 +335,7 @@ namespace Agile.Data
         DataTable QueryDataTable(SQLMapConfig config);
 
         /// <summary>
-        /// 执行sql语句，查询分页datatable
+        /// 执行sql语句，查询分页datatable,pageindex计数从0开始
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="pageIndex"></param>
@@ -462,16 +462,17 @@ namespace Agile.Data
             {
                 if (_transaction != null)
                 {
-                    //_transaction.Rollback();
                     _transaction.Dispose();
                     _transaction = null;
-
                 }
                 _connection.Close();
                 _connection = null;
             }
             GC.SuppressFinalize(this);
         }
+
+
+
 
 
         private static object lockObj = new object();
@@ -566,7 +567,7 @@ namespace Agile.Data
         /// <typeparam name="T"></typeparam>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public int Count<T>(object predicate) where T : class
+        public int Count<T>(object predicate = null) where T : class
         {
             return Connection.Count<T>(predicate, Transaction);
         }
@@ -597,7 +598,7 @@ namespace Agile.Data
         /// <param name="sort"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        public IEnumerable<T> GetList<T>(object predicate = null, IList<ISort> sort = null, bool buffered = false) where T : class
+        public IEnumerable<T> GetList<T>(object predicate = null, IList<ISort> sort = null, bool buffered = true) where T : class
         {
             return Connection.GetList<T>(predicate, sort, Transaction, null, buffered);
         }
@@ -625,12 +626,12 @@ namespace Agile.Data
 
 
         #region getpagedata
-        //public PageData<T> GetPageData<T>(int pageIndex = 1, int pageSize = 10, object predicate = null, IList<ISort> sort = null, bool buffered = false) where T : class
+        //public PageData<T> GetPageData<T>(int pageIndex = 1, int pageSize = 10, object predicate = null, IList<ISort> sort = null, bool buffered = true) where T : class
         //{
         //    return null;
         //}
 
-        //public PageData<T> GetPageData<T>(IDBSession session, int pageIndex = 1, int pageSize = 10, object predicate = null, IList<ISort> sort = null, bool buffered = false) where T : class
+        //public PageData<T> GetPageData<T>(IDBSession session, int pageIndex = 1, int pageSize = 10, object predicate = null, IList<ISort> sort = null, bool buffered = true) where T : class
         //{
         //    return null;
         //}
@@ -662,7 +663,7 @@ namespace Agile.Data
         /// <returns></returns>
         public int ExecuteSql(string sql, dynamic param = null)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             return Connection.Execute(sql, param as object, Transaction);
         }
 
@@ -673,10 +674,7 @@ namespace Agile.Data
         /// <returns></returns>
         public int ExecuteSql(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             return ExecuteSql(cmd.TransferedSQL, config.Parameters);
         }
 
@@ -689,7 +687,7 @@ namespace Agile.Data
         /// <returns></returns>
         public object ExecuteScalar(string sql, dynamic param = null)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             return Connection.ExecuteScalar(sql, param as object, Transaction);
         }
 
@@ -702,7 +700,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T ExecuteScalar<T>(string sql, dynamic param = null)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             return Connection.ExecuteScalar<T>(sql, param as object, Transaction);
         }
 
@@ -717,7 +715,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QueryFirst<T>(string sql, dynamic param = null)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             return Connection.QueryFirst<T>(sql, param as object, Transaction);
         }
 
@@ -732,7 +730,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QueryFirstOrDefault<T>(string sql, dynamic param = null)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             return Connection.QueryFirstOrDefault<T>(sql, param as object, Transaction);
         }
 
@@ -747,7 +745,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QuerySingle<T>(string sql, dynamic param = null)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             return Connection.QuerySingle<T>(sql, param as object, Transaction);
         }
 
@@ -762,7 +760,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QuerySingleOrDefault<T>(string sql, dynamic param = null)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             return Connection.QuerySingleOrDefault<T>(sql, param as object, Transaction);
         }
 
@@ -777,10 +775,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QueryFirst<T>(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             return QueryFirst<T>(cmd.TransferedSQL, config.Parameters);
         }
 
@@ -795,10 +790,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QueryFirstOrDefault<T>(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             return QueryFirstOrDefault<T>(cmd.TransferedSQL, config.Parameters);
         }
 
@@ -813,10 +805,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QuerySingle<T>(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             return QuerySingle<T>(cmd.TransferedSQL, config.Parameters);
         }
 
@@ -831,10 +820,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QuerySingleOrDefault<T>(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             return QuerySingleOrDefault<T>(cmd.TransferedSQL, config.Parameters);
         }
 
@@ -847,9 +833,9 @@ namespace Agile.Data
         /// <param name="param"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        public IEnumerable<T> QueryList<T>(string sql, dynamic param = null, bool buffered = false)
+        public IEnumerable<T> QueryList<T>(string sql, dynamic param = null, bool buffered = true)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             return Connection.Query<T>(sql, param as object, Transaction, buffered);
         }
 
@@ -861,15 +847,12 @@ namespace Agile.Data
         /// <returns></returns>
         public IEnumerable<T> QueryList<T>(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             return QueryList<T>(cmd.TransferedSQL, config.Parameters);
         }
 
         /// <summary>
-        /// 执行sql语句 根据条件筛选数据集合（分页）
+        /// 执行sql语句 根据条件筛选数据集合（分页）,pageindex计数从0开始
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
@@ -895,26 +878,23 @@ namespace Agile.Data
             }
 
             string allRowsCountSql = DapperExtensions.Instance.SqlGenerator.PageCount(sql);
-            DebugSql(pageSql, dynamicParameters);
-            IEnumerable<T> list = Connection.Query<T>(pageSql, dynamicParameters, Transaction, true);
+            DapperExtensions.DebugSql(allRowsCountSql, dynamicParameters);
+            allRowsCount = Connection.ExecuteScalar<int>(allRowsCountSql, dynamicParameters, Transaction);
 
-            DebugSql(allRowsCountSql, dynamicParameters);
-            allRowsCount = (int)Connection.Query(allRowsCountSql, dynamicParameters, Transaction, false).Single().Total;
+            DapperExtensions.DebugSql(pageSql, dynamicParameters);
+            IEnumerable<T> list = Connection.Query<T>(pageSql, dynamicParameters, Transaction, true);
             return list;
         }
 
         /// <summary>
-        /// 执行sqlmap sql语句，查询分页实体集合
+        /// 执行sqlmap sql语句，查询分页实体集合,pageindex计数从0开始
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <returns></returns>
         public IEnumerable<T> QueryPageList<T>(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             int allRowsCount = 0;
             var list = QueryPageList<T>(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
             config.AllRowsCount = allRowsCount;
@@ -929,11 +909,11 @@ namespace Agile.Data
         /// <returns></returns>
         public DataTable QueryDataTable(string sql, dynamic param = null)
         {
-            DebugSql(sql, param);
+            DapperExtensions.DebugSql(sql, param);
             var dReader = Connection.ExecuteReader(sql, param as object, Transaction);
-
             //datareader 转 datatable
-            return DataReadToDataTable(dReader);
+            var dt = DataReadToDataTable(dReader);
+            return dt;
         }
 
         /// <summary>
@@ -944,15 +924,12 @@ namespace Agile.Data
         /// <returns></returns>
         public DataTable QueryDataTable(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             return QueryDataTable(cmd.TransferedSQL, config.Parameters);
         }
 
         /// <summary>
-        /// 执行sql语句 根据条件筛选数据集合（返回分页DataTable）
+        /// 执行sql语句 根据条件筛选数据集合（返回分页DataTable）,pageindex计数从0开始
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="pageIndex"></param>
@@ -975,29 +952,26 @@ namespace Agile.Data
             }
 
             string allRowsCountSql = DapperExtensions.Instance.SqlGenerator.PageCount(sql);
-            DebugSql(pageSql, dynamicParameters);
+            DapperExtensions.DebugSql(allRowsCountSql, dynamicParameters);
+            allRowsCount = Connection.ExecuteScalar<int>(allRowsCountSql, dynamicParameters, Transaction);
+
+            DapperExtensions.DebugSql(pageSql, dynamicParameters);
             var dReader = Connection.ExecuteReader(pageSql, dynamicParameters, Transaction);
-
-            DebugSql(allRowsCountSql, dynamicParameters);
-            allRowsCount = (int)Connection.Query(allRowsCountSql, dynamicParameters, Transaction, false).Single().Total;
-
             //datareader 转 datatable
-            return DataReadToDataTable(dReader);
+            var dt = DataReadToDataTable(dReader);
+            return dt;
         }
 
 
         /// <summary>
-        /// 执行sqlmap sql语句，查询分页datatable
+        /// 执行sqlmap sql语句，查询分页datatable,pageindex计数从0开始
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="config"></param>
         /// <returns></returns>
         public DataTable QueryPageDataTable(SQLMapConfig config)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SqlMap", config.SQLMapFile);
-            if (!File.Exists(filePath))
-                filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "SqlMap", config.SQLMapFile);
-            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            var cmd = ParseSqlMapFile(config);
             int allRowsCount = 0;
             var datatable = QueryPageDataTable(cmd.TransferedSQL, config.PageIndex, config.PageSize, out allRowsCount, config.Parameters);
             config.AllRowsCount = allRowsCount;
@@ -1015,7 +989,7 @@ namespace Agile.Data
         /// <returns></returns>
         public int ExecuteProcedure(string procName, dynamic param = null)
         {
-            DebugSql(procName, param);
+            DapperExtensions.DebugSql(procName, param);
             return Connection.Execute(procName, param as object, Transaction, null, CommandType.StoredProcedure);
         }
 
@@ -1028,8 +1002,8 @@ namespace Agile.Data
         /// <returns></returns>
         public IEnumerable<T> ExecuteProcedure<T>(string procName, dynamic param)
         {
-            DebugSql(procName, param);
-            IEnumerable<T> list = Connection.Query<T>(procName, param as object, Transaction, false, null, CommandType.StoredProcedure);
+            DapperExtensions.DebugSql(procName, param);
+            IEnumerable<T> list = Connection.Query<T>(procName, param as object, Transaction, true, null, CommandType.StoredProcedure);
             return list;
         }
         #endregion
@@ -1082,18 +1056,13 @@ namespace Agile.Data
             }
         }
 
-
-        /// <summary>
-        /// 调试sql脚本
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        private void DebugSql(string sql, object param)
+        private SQLMapCommandInfo ParseSqlMapFile(SQLMapConfig config)
         {
-            if (DapperExtensions.Configuration.IsEnableLogEvent)
-            {
-                DapperExtensions.Configuration.LogEventCompleted?.Invoke(sql, param);
-            }
+            var fileFolder = string.IsNullOrEmpty(config.SQLMapFileFolder) ? "SqlMap" : config.SQLMapFileFolder;
+            var fileName = config.SQLMapFileName;
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileFolder, fileName);
+            var cmd = SQLMapHelper.GetByCode(filePath, config.Code, config.Parameters);
+            return cmd;
         }
         #endregion
     }

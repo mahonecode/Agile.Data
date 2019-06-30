@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2019
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29020.237
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{C518A3C8-1C5F-42FB-98D3-6C91007F5083}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestOracle", "test\XUnitTestOracle\XUnitTestOracle.csproj", "{D4F2979B-2A96-423F-8461-4B2A85AEBC6B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XUnitTestSqlServer", "test\XUnitTestSqlServer\XUnitTestSqlServer.csproj", "{494BF7AF-0D85-438D-8505-46E84DFCE39B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitTestData", "XUnitTestData\XUnitTestData.csproj", "{229EF983-BC0F-4B1A-95E7-472A6749001B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{494BF7AF-0D85-438D-8505-46E84DFCE39B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{494BF7AF-0D85-438D-8505-46E84DFCE39B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{494BF7AF-0D85-438D-8505-46E84DFCE39B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{229EF983-BC0F-4B1A-95E7-472A6749001B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{229EF983-BC0F-4B1A-95E7-472A6749001B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{229EF983-BC0F-4B1A-95E7-472A6749001B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{229EF983-BC0F-4B1A-95E7-472A6749001B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{235AE8E0-2E6A-40BF-B388-66D27761483A} = {C518A3C8-1C5F-42FB-98D3-6C91007F5083}
 		{D4F2979B-2A96-423F-8461-4B2A85AEBC6B} = {2D2D3C87-8A3F-49F0-8068-F395678B32CD}
 		{494BF7AF-0D85-438D-8505-46E84DFCE39B} = {2D2D3C87-8A3F-49F0-8068-F395678B32CD}
+		{229EF983-BC0F-4B1A-95E7-472A6749001B} = {2D2D3C87-8A3F-49F0-8068-F395678B32CD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0ED84072-C790-466C-A3E1-897447ADF5B4}

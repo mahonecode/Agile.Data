@@ -7,9 +7,9 @@ namespace Agile.Data
     public class ConnectionConfig
     {
         /// <summary>
-        ///DbType.SqlServer Or Other
+        ///DatabaseType.SqlServer Or Other
         /// </summary>
-        public DbType DbType { get; set; }
+        public DatabaseType DbType { get; set; }
 
         /// <summary>
         ///Database Connection string

@@ -15,52 +15,38 @@ namespace Agile.Data.Extensions
         private readonly static object _lock = new object();
         
         private static IDapperImplementor _instance;
-        private static IDapperExtensionsConfiguration _configuration;
         private static Func<IDapperExtensionsConfiguration, IDapperImplementor> _instanceFactory;
 
 
-        public static IDapperExtensionsConfiguration Configuration
+        static DapperExtensions()
         {
-            get
-            {
-                return _configuration;
-            }
-        }
-
-
-        /// <summary>
-        /// Gets or sets the default class mapper to use when generating class maps. If not specified, AutoClassMapper<T> is used.
-        /// DapperExtensions.Configure(Type, IList<Assembly>, ISqlDialect) can be used instead to set all values at once
-        /// </summary>
-        public static Type DefaultMapper
-        {
-            get
-            {
-                return _configuration.DefaultMapper;
-            }
-
-            set
-            {
-                Configure(value, _configuration.MappingAssemblies, _configuration.Dialect);
-            }
+            Configure(typeof(AutoClassMapper<>), new List<Assembly>(), new SqlServerDialect());
         }
 
         /// <summary>
-        /// Gets or sets the type of sql to be generated.
-        /// DapperExtensions.Configure(Type, IList<Assembly>, ISqlDialect) can be used instead to set all values at once
+        /// Gets the Dapper Extensions Implementation
         /// </summary>
-        public static ISqlDialect SqlDialect
+        public static IDapperImplementor Instance
         {
             get
             {
-                return _configuration.Dialect;
-            }
+                if (_instance == null)
+                {
+                    lock (_lock)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = InstanceFactory(Configuration);
+                        }
+                    }
+                }
 
-            set
-            {
-                Configure(_configuration.DefaultMapper, _configuration.MappingAssemblies, value);
+                return _instance;
             }
         }
+
+        public static IDapperExtensionsConfiguration Configuration { get; private set; }
+
 
         /// <summary>
         /// Get or sets the Dapper Extensions Implementation Factory.
@@ -79,36 +65,46 @@ namespace Agile.Data.Extensions
             set
             {
                 _instanceFactory = value;
-                Configure(_configuration.DefaultMapper, _configuration.MappingAssemblies, _configuration.Dialect);
+                Configure(Configuration.DefaultMapper, Configuration.MappingAssemblies, Configuration.Dialect);
+            }
+        }
+
+
+        /// <summary>
+        /// Gets or sets the default class mapper to use when generating class maps. If not specified, AutoClassMapper<T> is used.
+        /// DapperExtensions.Configure(Type, IList<Assembly>, ISqlDialect) can be used instead to set all values at once
+        /// </summary>
+        public static Type DefaultMapper
+        {
+            get
+            {
+                return Configuration.DefaultMapper;
+            }
+
+            set
+            {
+                Configure(value, Configuration.MappingAssemblies, Configuration.Dialect);
             }
         }
 
         /// <summary>
-        /// Gets the Dapper Extensions Implementation
+        /// Gets or sets the type of sql to be generated.
+        /// DapperExtensions.Configure(Type, IList<Assembly>, ISqlDialect) can be used instead to set all values at once
         /// </summary>
-        public static IDapperImplementor Instance
+        public static ISqlDialect SqlDialect
         {
             get
             {
-                if (_instance == null)
-                {
-                    lock (_lock)
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = InstanceFactory(_configuration);
-                        }
-                    }
-                }
+                return Configuration.Dialect;
+            }
 
-                return _instance;
+            set
+            {
+                Configure(Configuration.DefaultMapper, Configuration.MappingAssemblies, value);
             }
         }
 
-        static DapperExtensions()
-        {
-            Configure(typeof(AutoClassMapper<>), new List<Assembly>(), new SqlServerDialect());
-        }
+
 
         /// <summary>
         /// Add other assemblies that Dapper Extensions will search if a mapping is not found in the same assembly of the POCO.
@@ -116,7 +112,7 @@ namespace Agile.Data.Extensions
         /// <param name="assemblies"></param>
         public static void SetMappingAssemblies(IList<Assembly> assemblies)
         {
-            Configure(_configuration.DefaultMapper, assemblies, _configuration.Dialect);
+            Configure(Configuration.DefaultMapper, assemblies, Configuration.Dialect);
         }
 
         /// <summary>
@@ -128,7 +124,7 @@ namespace Agile.Data.Extensions
         public static void Configure(IDapperExtensionsConfiguration configuration)
         {
             _instance = null;
-            _configuration = configuration;
+            Configuration = configuration;
         }
 
         /// <summary>
@@ -142,14 +138,20 @@ namespace Agile.Data.Extensions
             Configure(new DapperExtensionsConfiguration(defaultMapper, mappingAssemblies, sqlDialect));
         }
 
-        public static void Configure(ISqlDialect sqlDialect, Type defaultMapper = null, IList<Assembly> mappingAssemblies = null)
+        /// <summary>
+        /// Configure DapperExtensions extension methods. typeof(AutoClassMapper<>), new List<Assembly>(),sqlDialect
+        /// </summary>
+        /// <param name="sqlDialect"></param>
+        public static void Configure(ISqlDialect sqlDialect)
         {
-            defaultMapper = defaultMapper ?? typeof(AutoClassMapper<>);
-            mappingAssemblies = mappingAssemblies ?? new List<Assembly>();
-            Configure(new DapperExtensionsConfiguration(defaultMapper, mappingAssemblies, sqlDialect));
+            Configure(new DapperExtensionsConfiguration(typeof(AutoClassMapper<>), new List<Assembly>(), sqlDialect));
         }
 
         #endregion
+
+
+
+
 
 
 
@@ -522,7 +524,18 @@ namespace Agile.Data.Extensions
             return Instance.SqlGenerator.Configuration.GetNextGuid();
         }
 
-
+        /// <summary>
+        /// 调试sql脚本
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="param"></param>
+        public static void DebugSql(string sql, object param)
+        {
+            if (Configuration.IsEnableLogEvent)
+            {
+                Configuration.LogEventCompleted?.Invoke(sql, param);
+            }
+        }
         #endregion
     }
 }

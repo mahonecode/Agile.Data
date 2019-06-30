@@ -25,7 +25,6 @@ namespace Agile.Data.Extensions
     /// </summary>
     public class DapperExtensionsConfiguration : IDapperExtensionsConfiguration
     {
-        public DateTime NowTime { get; set; }
         public bool IsEnableLogEvent { get; set; }
         public Action<string, object> LogEventCompleted { get; set; }
 
@@ -38,14 +37,16 @@ namespace Agile.Data.Extensions
             Dialect = sqlDialect;
         }
 
-        public DapperExtensionsConfiguration() : this(typeof(AutoClassMapper<>), new List<Assembly>(), new SqlServerDialect())
+        public DapperExtensionsConfiguration() 
+            : this(typeof(AutoClassMapper<>), new List<Assembly>(), new SqlServerDialect())
         {
 
         }
 
-        public DapperExtensionsConfiguration(ISqlDialect sqlDialect) : this(typeof(AutoClassMapper<>), new List<Assembly>(), sqlDialect)
+        public DapperExtensionsConfiguration(ISqlDialect sqlDialect) 
+            : this(typeof(AutoClassMapper<>), new List<Assembly>(), sqlDialect)
         {
-            NowTime = DateTime.Now;
+
         }
 
 

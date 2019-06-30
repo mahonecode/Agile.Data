@@ -3,12 +3,10 @@ using System.Collections.Generic;
 
 namespace Agile.Data.Extensions
 {
-
     public interface IMultipleResultReader
     {
         IEnumerable<T> Read<T>();
     }
-
 
     public class GridReaderResultReader : IMultipleResultReader
     {
@@ -24,7 +22,6 @@ namespace Agile.Data.Extensions
             return _reader.Read<T>();
         }
     }
-
 
     public class SequenceReaderResultReader : IMultipleResultReader
     {

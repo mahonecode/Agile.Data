@@ -24,8 +24,8 @@ namespace Agile.Data.Extensions
 
         public override string GetPagingSql(string sql, int page, int resultsPerPage, IDictionary<string, object> parameters)
         {
-            int startValue = ((page-1) * resultsPerPage) + 1;
-            return GetSetSql(sql, startValue < 1 ? 1 : startValue, resultsPerPage, parameters);
+            int startValue = (page * resultsPerPage) + 1;
+            return GetSetSql(sql, startValue, resultsPerPage, parameters);
         }
 
         public override string GetSetSql(string sql, int firstResult, int maxResults, IDictionary<string, object> parameters)

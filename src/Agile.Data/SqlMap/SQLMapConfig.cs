@@ -10,7 +10,8 @@ namespace Agile.Data.SqlMap
     public class SQLMapConfig
     {
         public string Code { get; set; }
-        public string SQLMapFile { get; set; }
+        public string SQLMapFileFolder { get; set; } = "SqlMap";
+        public string SQLMapFileName { get; set; }
         public Dictionary<string, object> Parameters { get; set; }
 
         //分页查询 需要

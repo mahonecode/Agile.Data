@@ -4,7 +4,10 @@ using System.Text;
 
 namespace Agile.Data
 {
-    public enum DbType
+    /// <summary>
+    /// 支持的数据库类型
+    /// </summary>
+    public enum DatabaseType
     {
         MySql,
         SqlServer,        
