@@ -3,13 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Description>dapper extension micro-orm sql</Description>
     <PackageTags>dapper extension micro-orm sql</PackageTags>
     <PackageReleaseNotes>dapper extension micro-orm sql</PackageReleaseNotes>
     <Authors>fengyanfei</Authors>
     <Company>fengyanfei</Company>
-    <Copyright>http://www.apache.org/licenses/LICENSE-2.0</Copyright>
+    <Copyright>fengyanfei</Copyright>
     <PackageProjectUrl>https://github.com/mahonecode/Agile.Data</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mahonecode/Agile.Data</RepositoryUrl>
   </PropertyGroup>

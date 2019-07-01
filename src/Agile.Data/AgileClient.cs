@@ -9,11 +9,9 @@ namespace Agile.Data
 {
     public class AgileClient
     {
-        private ConnectionConfig CurrentConnectionConfig { get; set; }
-
         public AgileClient(ConnectionConfig config)
         {
-            this.CurrentConnectionConfig = config;
+            DapperExtensions.CurrentConnectionConfig = config;
         }
 
         /// <summary>
@@ -34,19 +32,19 @@ namespace Agile.Data
         public IDbConnection CreateDbConnection()
         {
             IDbConnection conn;
-            switch (CurrentConnectionConfig.DbType)
+            switch (DapperExtensions.CurrentConnectionConfig.DbType)
             {
                 case DatabaseType.MySql:
                     DapperExtensions.SqlDialect = new MySqlDialect();
-                    conn = new MySqlConnection(CurrentConnectionConfig.ConnectionString);
+                    conn = new MySqlConnection(DapperExtensions.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.SqlServer:
                     DapperExtensions.SqlDialect = new SqlServerDialect();
-                    conn = new SqlConnection(CurrentConnectionConfig.ConnectionString);
+                    conn = new SqlConnection(DapperExtensions.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.Oracle:
                     DapperExtensions.SqlDialect = new OracleDialect();
-                    conn = new OracleConnection(CurrentConnectionConfig.ConnectionString);
+                    conn = new OracleConnection(DapperExtensions.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.Sqlite:
                     throw new Exception("Sqlite 暂不支持");
@@ -65,7 +63,7 @@ namespace Agile.Data
             //否则每次操作之后dapper底层会自动关闭连接
             if (conn.State == ConnectionState.Closed)
             {
-                if (!CurrentConnectionConfig.IsAutoCloseConnection)
+                if (!DapperExtensions.CurrentConnectionConfig.IsAutoCloseConnection)
                 {
                     conn.Open();
                 }
@@ -169,22 +167,5 @@ namespace Agile.Data
             }
         }
         #endregion
-
-        /// <summary>
-        /// 是否开启脚本日志
-        /// </summary>
-        public bool IsEnableLogEvent
-        {
-            get
-            {
-                return DapperExtensions.Configuration.IsEnableLogEvent;
-            }
-            set
-            {
-                DapperExtensions.Configuration.IsEnableLogEvent = value;
-            }
-        }
-
-        public Action<string, object> OnLogExecuted { set { DapperExtensions.Configuration.LogEventCompleted = value; } }
     }
 }

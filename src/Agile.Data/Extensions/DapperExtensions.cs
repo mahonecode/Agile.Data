@@ -16,7 +16,7 @@ namespace Agile.Data.Extensions
         
         private static IDapperImplementor _instance;
         private static Func<IDapperExtensionsConfiguration, IDapperImplementor> _instanceFactory;
-
+        public static ConnectionConfig CurrentConnectionConfig { get; set; }
 
         static DapperExtensions()
         {
@@ -148,10 +148,6 @@ namespace Agile.Data.Extensions
         }
 
         #endregion
-
-
-
-
 
 
 
@@ -531,9 +527,9 @@ namespace Agile.Data.Extensions
         /// <param name="param"></param>
         public static void DebugSql(string sql, object param)
         {
-            if (Configuration.IsEnableLogEvent)
+            if (CurrentConnectionConfig.IsEnableLogEvent)
             {
-                Configuration.LogEventCompleted?.Invoke(sql, param);
+                CurrentConnectionConfig.OnLogExecuted?.Invoke(sql, param);
             }
         }
         #endregion

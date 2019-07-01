@@ -8,9 +8,6 @@ namespace Agile.Data.Extensions
 {
     public interface IDapperExtensionsConfiguration
     {
-        bool IsEnableLogEvent { get; set; }
-        Action<string, object> LogEventCompleted { get; set; }
-
         Type DefaultMapper { get; }
         IList<Assembly> MappingAssemblies { get; }
         ISqlDialect Dialect { get; }
@@ -25,9 +22,6 @@ namespace Agile.Data.Extensions
     /// </summary>
     public class DapperExtensionsConfiguration : IDapperExtensionsConfiguration
     {
-        public bool IsEnableLogEvent { get; set; }
-        public Action<string, object> LogEventCompleted { get; set; }
-
         private readonly ConcurrentDictionary<Type, IClassMapper> _classMaps = new ConcurrentDictionary<Type, IClassMapper>();
 
         public DapperExtensionsConfiguration(Type defaultMapper, IList<Assembly> mappingAssemblies, ISqlDialect sqlDialect)
