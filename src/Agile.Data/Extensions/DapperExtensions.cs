@@ -16,7 +16,7 @@ namespace Agile.Data.Extensions
         
         private static IDapperImplementor _instance;
         private static Func<IDapperExtensionsConfiguration, IDapperImplementor> _instanceFactory;
-        public static ConnectionConfig CurrentConnectionConfig { get; set; }
+        
 
         static DapperExtensions()
         {
@@ -57,7 +57,7 @@ namespace Agile.Data.Extensions
             {
                 if (_instanceFactory == null)
                 {
-                    _instanceFactory = config => new DapperImplementor(new SqlGeneratorImpl(config));
+                    _instanceFactory = config => new DapperImplementor(new SqlGeneratorImpl(config), config.SqlLoger);
                 }
 
                 return _instanceFactory;
@@ -80,7 +80,6 @@ namespace Agile.Data.Extensions
             {
                 return Configuration.DefaultMapper;
             }
-
             set
             {
                 Configure(value, Configuration.MappingAssemblies, Configuration.Dialect);
@@ -97,7 +96,6 @@ namespace Agile.Data.Extensions
             {
                 return Configuration.Dialect;
             }
-
             set
             {
                 Configure(Configuration.DefaultMapper, Configuration.MappingAssemblies, value);
@@ -116,16 +114,15 @@ namespace Agile.Data.Extensions
         }
 
         /// <summary>
-        /// Configure DapperExtensions extension methods.
+        /// Configure DapperExtensions extension methods. typeof(AutoClassMapper<>), new List<Assembly>(),sqlDialect
         /// </summary>
-        /// <param name="defaultMapper"></param>
-        /// <param name="mappingAssemblies"></param>
         /// <param name="sqlDialect"></param>
-        public static void Configure(IDapperExtensionsConfiguration configuration)
+        public static void Configure(ISqlDialect sqlDialect)
         {
-            _instance = null;
-            Configuration = configuration;
+            IDapperExtensionsConfiguration configuration = new DapperExtensionsConfiguration(typeof(AutoClassMapper<>), new List<Assembly>(), sqlDialect);
+            Configure(configuration);
         }
+
 
         /// <summary>
         /// Configure DapperExtensions extension methods.
@@ -135,16 +132,21 @@ namespace Agile.Data.Extensions
         /// <param name="sqlDialect"></param>
         public static void Configure(Type defaultMapper, IList<Assembly> mappingAssemblies, ISqlDialect sqlDialect)
         {
-            Configure(new DapperExtensionsConfiguration(defaultMapper, mappingAssemblies, sqlDialect));
+            IDapperExtensionsConfiguration configuration = new DapperExtensionsConfiguration(defaultMapper, mappingAssemblies, sqlDialect);
+            Configure(configuration);
         }
 
+
         /// <summary>
-        /// Configure DapperExtensions extension methods. typeof(AutoClassMapper<>), new List<Assembly>(),sqlDialect
+        /// Configure DapperExtensions extension methods.
         /// </summary>
+        /// <param name="defaultMapper"></param>
+        /// <param name="mappingAssemblies"></param>
         /// <param name="sqlDialect"></param>
-        public static void Configure(ISqlDialect sqlDialect)
+        public static void Configure(IDapperExtensionsConfiguration configuration)
         {
-            Configure(new DapperExtensionsConfiguration(typeof(AutoClassMapper<>), new List<Assembly>(), sqlDialect));
+            _instance = null;
+            Configuration = configuration;
         }
 
         #endregion
@@ -518,19 +520,6 @@ namespace Agile.Data.Extensions
         public static Guid GetNextGuid()
         {
             return Instance.SqlGenerator.Configuration.GetNextGuid();
-        }
-
-        /// <summary>
-        /// 调试sql脚本
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        public static void DebugSql(string sql, object param)
-        {
-            if (CurrentConnectionConfig.IsEnableLogEvent)
-            {
-                CurrentConnectionConfig.OnLogExecuted?.Invoke(sql, param);
-            }
         }
         #endregion
     }

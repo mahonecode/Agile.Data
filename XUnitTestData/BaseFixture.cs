@@ -16,7 +16,7 @@ namespace XUnitTestData
             string connectionString = "Data Source=127.0.0.1;Initial Catalog=dapper;User Id=sa;Password=123456;Persist Security Info=True;";
 
             var config = new ConnectionConfig { ConnectionString = connectionString, DbType = DatabaseType.SqlServer };
-            config.IsEnableLogEvent = true;//开启日志
+            config.IsEnableLogEvent = false;//开启日志
             config.OnLogExecuted = (sql, param) =>
             {
                 var strSql = sql;
@@ -27,13 +27,13 @@ namespace XUnitTestData
 
 
             var files = new List<string>
-                                {
-                                    ReadScriptFile("CreateAnimalTable"),
-                                    ReadScriptFile("CreateFooTable"),
-                                    ReadScriptFile("CreateMultikeyTable"),
-                                    ReadScriptFile("CreatePersonTable"),
-                                    ReadScriptFile("CreateCarTable")
-                                };
+            {
+                ReadScriptFile("CreateAnimalTable"),
+                ReadScriptFile("CreateFooTable"),
+                ReadScriptFile("CreateMultikeyTable"),
+                ReadScriptFile("CreatePersonTable"),
+                ReadScriptFile("CreateCarTable")
+            };
 
             foreach (var setupFile in files)
             {

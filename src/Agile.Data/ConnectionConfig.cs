@@ -31,4 +31,22 @@ namespace Agile.Data
         /// </summary>
         public Action<string, object> OnLogExecuted { get; set; }
     }
+
+    public class SqlLoger
+    {
+        private ConnectionConfig _currentConnectionConfig;
+
+        public SqlLoger(ConnectionConfig config)
+        {
+            _currentConnectionConfig = config;
+        }
+
+        public void DebugSql(string sql, object param)
+        {
+            if (_currentConnectionConfig != null && _currentConnectionConfig.IsEnableLogEvent)
+            {
+                _currentConnectionConfig.OnLogExecuted?.Invoke(sql, param);
+            }
+        }
+    }
 }

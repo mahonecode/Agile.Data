@@ -379,32 +379,26 @@ namespace Agile.Data
     /// </summary>
     public class DbSession : IDbSession
     {
-        private IDbConnection _connection;
-        private IDbTransaction _transaction;
+        private SqlLoger _sqlLoger;
 
         /// <summary>
         /// 数据库连接对象
         /// </summary>
-        public IDbConnection Connection
-        {
-            get { return _connection; }
-        }
+        public IDbConnection Connection { get; private set; }
 
         /// <summary>
         /// 数据库事务对象
         /// </summary>
-        public IDbTransaction Transaction
-        {
-            get { return _transaction; }
-        }
+        public IDbTransaction Transaction { get; private set; }
 
         /// <summary>
         /// 构造方法
         /// </summary>
         /// <param name="conn">连接</param>
-        internal DbSession(IDbConnection conn)
+        internal DbSession(IDbConnection conn, SqlLoger sqlLoger)
         {
-            _connection = conn;
+            Connection = conn;
+            _sqlLoger = sqlLoger;
         }
 
         /// <summary>
@@ -412,10 +406,11 @@ namespace Agile.Data
         /// </summary>
         /// <param name="conn">连接</param>
         /// <param name="trans">事务</param>
-        internal DbSession(IDbConnection conn, IDbTransaction trans)
+        internal DbSession(IDbConnection conn, IDbTransaction trans, SqlLoger sqlLoger)
         {
-            _connection = conn;
-            _transaction = trans;
+            Connection = conn;
+            Transaction = trans;
+            _sqlLoger = sqlLoger;
         }
 
         /// <summary>
@@ -430,8 +425,8 @@ namespace Agile.Data
                 //dapper手动打开的话会保持长连接，否则每次查询之后会关闭连接
                 Connection.Open();
             }
-            _transaction = Connection.BeginTransaction(isolationLevel);
-            return _transaction;
+            Transaction = Connection.BeginTransaction(isolationLevel);
+            return Transaction;
         }
 
         /// <summary>
@@ -439,8 +434,8 @@ namespace Agile.Data
         /// </summary>
         public void Commit()
         {
-            _transaction.Commit();
-            _transaction = null;
+            Transaction.Commit();
+            Transaction = null;
         }
 
         /// <summary>
@@ -448,8 +443,8 @@ namespace Agile.Data
         /// </summary>
         public void Rollback()
         {
-            _transaction.Rollback();
-            _transaction = null;
+            Transaction.Rollback();
+            Transaction = null;
         }
 
 
@@ -458,15 +453,15 @@ namespace Agile.Data
         /// </summary>
         public void Dispose()
         {
-            if (_connection.State != ConnectionState.Closed)
+            if (Connection.State != ConnectionState.Closed)
             {
-                if (_transaction != null)
+                if (Transaction != null)
                 {
-                    _transaction.Dispose();
-                    _transaction = null;
+                    Transaction.Dispose();
+                    Transaction = null;
                 }
-                _connection.Close();
-                _connection = null;
+                Connection.Close();
+                Connection = null;
             }
             GC.SuppressFinalize(this);
         }
@@ -663,7 +658,7 @@ namespace Agile.Data
         /// <returns></returns>
         public int ExecuteSql(string sql, dynamic param = null)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             return Connection.Execute(sql, param as object, Transaction);
         }
 
@@ -687,7 +682,7 @@ namespace Agile.Data
         /// <returns></returns>
         public object ExecuteScalar(string sql, dynamic param = null)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             return Connection.ExecuteScalar(sql, param as object, Transaction);
         }
 
@@ -700,7 +695,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T ExecuteScalar<T>(string sql, dynamic param = null)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             return Connection.ExecuteScalar<T>(sql, param as object, Transaction);
         }
 
@@ -715,7 +710,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QueryFirst<T>(string sql, dynamic param = null)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             return Connection.QueryFirst<T>(sql, param as object, Transaction);
         }
 
@@ -730,7 +725,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QueryFirstOrDefault<T>(string sql, dynamic param = null)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             return Connection.QueryFirstOrDefault<T>(sql, param as object, Transaction);
         }
 
@@ -745,7 +740,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QuerySingle<T>(string sql, dynamic param = null)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             return Connection.QuerySingle<T>(sql, param as object, Transaction);
         }
 
@@ -760,7 +755,7 @@ namespace Agile.Data
         /// <returns></returns>
         public T QuerySingleOrDefault<T>(string sql, dynamic param = null)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             return Connection.QuerySingleOrDefault<T>(sql, param as object, Transaction);
         }
 
@@ -835,7 +830,7 @@ namespace Agile.Data
         /// <returns></returns>
         public IEnumerable<T> QueryList<T>(string sql, dynamic param = null, bool buffered = true)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             return Connection.Query<T>(sql, param as object, Transaction, buffered);
         }
 
@@ -878,10 +873,10 @@ namespace Agile.Data
             }
 
             string allRowsCountSql = DapperExtensions.Instance.SqlGenerator.PageCount(sql);
-            DapperExtensions.DebugSql(allRowsCountSql, dynamicParameters);
+            _sqlLoger.DebugSql(allRowsCountSql, dynamicParameters);
             allRowsCount = Connection.ExecuteScalar<int>(allRowsCountSql, dynamicParameters, Transaction);
 
-            DapperExtensions.DebugSql(pageSql, dynamicParameters);
+            _sqlLoger.DebugSql(pageSql, dynamicParameters);
             IEnumerable<T> list = Connection.Query<T>(pageSql, dynamicParameters, Transaction, true);
             return list;
         }
@@ -909,7 +904,7 @@ namespace Agile.Data
         /// <returns></returns>
         public DataTable QueryDataTable(string sql, dynamic param = null)
         {
-            DapperExtensions.DebugSql(sql, param);
+            _sqlLoger.DebugSql(sql, param);
             var dReader = Connection.ExecuteReader(sql, param as object, Transaction);
             //datareader 转 datatable
             var dt = DataReadToDataTable(dReader);
@@ -952,10 +947,10 @@ namespace Agile.Data
             }
 
             string allRowsCountSql = DapperExtensions.Instance.SqlGenerator.PageCount(sql);
-            DapperExtensions.DebugSql(allRowsCountSql, dynamicParameters);
+            _sqlLoger.DebugSql(allRowsCountSql, dynamicParameters);
             allRowsCount = Connection.ExecuteScalar<int>(allRowsCountSql, dynamicParameters, Transaction);
 
-            DapperExtensions.DebugSql(pageSql, dynamicParameters);
+            _sqlLoger.DebugSql(pageSql, dynamicParameters);
             var dReader = Connection.ExecuteReader(pageSql, dynamicParameters, Transaction);
             //datareader 转 datatable
             var dt = DataReadToDataTable(dReader);
@@ -989,7 +984,7 @@ namespace Agile.Data
         /// <returns></returns>
         public int ExecuteProcedure(string procName, dynamic param = null)
         {
-            DapperExtensions.DebugSql(procName, param);
+            _sqlLoger.DebugSql(procName, param);
             return Connection.Execute(procName, param as object, Transaction, null, CommandType.StoredProcedure);
         }
 
@@ -1002,7 +997,7 @@ namespace Agile.Data
         /// <returns></returns>
         public IEnumerable<T> ExecuteProcedure<T>(string procName, dynamic param)
         {
-            DapperExtensions.DebugSql(procName, param);
+            _sqlLoger.DebugSql(procName, param);
             IEnumerable<T> list = Connection.Query<T>(procName, param as object, Transaction, true, null, CommandType.StoredProcedure);
             return list;
         }

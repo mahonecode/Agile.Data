@@ -9,9 +9,13 @@ namespace Agile.Data
 {
     public class AgileClient
     {
+        private ConnectionConfig CurrentConnectionConfig { get; set; }
+        private SqlLoger SqlLoger { get; set; }
+
         public AgileClient(ConnectionConfig config)
         {
-            DapperExtensions.CurrentConnectionConfig = config;
+            this.CurrentConnectionConfig = config;
+            SqlLoger = new SqlLoger(config);
         }
 
         /// <summary>
@@ -32,19 +36,22 @@ namespace Agile.Data
         public IDbConnection CreateDbConnection()
         {
             IDbConnection conn;
-            switch (DapperExtensions.CurrentConnectionConfig.DbType)
+            switch (this.CurrentConnectionConfig.DbType)
             {
                 case DatabaseType.MySql:
                     DapperExtensions.SqlDialect = new MySqlDialect();
-                    conn = new MySqlConnection(DapperExtensions.CurrentConnectionConfig.ConnectionString);
+                    DapperExtensions.Configuration.SqlLoger = SqlLoger;
+                    conn = new MySqlConnection(this.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.SqlServer:
                     DapperExtensions.SqlDialect = new SqlServerDialect();
-                    conn = new SqlConnection(DapperExtensions.CurrentConnectionConfig.ConnectionString);
+                    DapperExtensions.Configuration.SqlLoger = SqlLoger;
+                    conn = new SqlConnection(this.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.Oracle:
                     DapperExtensions.SqlDialect = new OracleDialect();
-                    conn = new OracleConnection(DapperExtensions.CurrentConnectionConfig.ConnectionString);
+                    DapperExtensions.Configuration.SqlLoger = SqlLoger;
+                    conn = new OracleConnection(this.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.Sqlite:
                     throw new Exception("Sqlite 暂不支持");
@@ -63,7 +70,7 @@ namespace Agile.Data
             //否则每次操作之后dapper底层会自动关闭连接
             if (conn.State == ConnectionState.Closed)
             {
-                if (!DapperExtensions.CurrentConnectionConfig.IsAutoCloseConnection)
+                if (!this.CurrentConnectionConfig.IsAutoCloseConnection)
                 {
                     conn.Open();
                 }
@@ -79,7 +86,7 @@ namespace Agile.Data
         /// <returns></returns>
         public IDbSession CreateSession()
         {
-            IDbSession session = new DbSession(this.CreateDbConnection());
+            IDbSession session = new DbSession(this.CreateDbConnection(), SqlLoger);
             return session;
         }
 
@@ -91,7 +98,7 @@ namespace Agile.Data
         /// <returns></returns>
         public IDbSession CreateSession(IDbConnection conn, IDbTransaction trans)
         {
-            IDbSession session = new DbSession(conn, trans);
+            IDbSession session = new DbSession(conn, trans, SqlLoger);
             return session;
         }
 

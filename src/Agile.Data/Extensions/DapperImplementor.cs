@@ -88,9 +88,12 @@ namespace Agile.Data.Extensions
     {
         public ISqlGenerator SqlGenerator { get; private set; }
 
-        public DapperImplementor(ISqlGenerator sqlGenerator)
+        private SqlLoger _sqlLoger;
+
+        public DapperImplementor(ISqlGenerator sqlGenerator, SqlLoger sqlLoger)
         {
             SqlGenerator = sqlGenerator;
+            _sqlLoger = sqlLoger;
         }
                        
 
@@ -140,12 +143,12 @@ namespace Agile.Data.Extensions
 
             if (triggerIdentityColumn == null)
             {
-                DapperExtensions.DebugSql(sql, entities);
+                _sqlLoger.DebugSql(sql, entities);
                 connection.Execute(sql, entities, transaction, commandTimeout, CommandType.Text);
             }
             else
             {
-                DapperExtensions.DebugSql(sql, parameters);
+                _sqlLoger.DebugSql(sql, parameters);
                 connection.Execute(sql, parameters, transaction, commandTimeout, CommandType.Text);
             }
         }
@@ -173,15 +176,15 @@ namespace Agile.Data.Extensions
                 if (SqlGenerator.SupportsMultipleStatements())
                 {
                     sql += SqlGenerator.Configuration.Dialect.BatchSeperator + SqlGenerator.IdentitySql(classMap,schemaName, tableName);
-                    DapperExtensions.DebugSql(sql, entity);
+                    _sqlLoger.DebugSql(sql, entity);
                     result = connection.Query<long>(sql, entity, transaction, false, commandTimeout, CommandType.Text);
                 }
                 else
                 {
-                    DapperExtensions.DebugSql(sql, entity);
+                    _sqlLoger.DebugSql(sql, entity);
                     connection.Execute(sql, entity, transaction, commandTimeout, CommandType.Text);
                     sql = SqlGenerator.IdentitySql(classMap,schemaName, tableName);
-                    DapperExtensions.DebugSql(sql, entity);
+                    _sqlLoger.DebugSql(sql, entity);
                     result = connection.Query<long>(sql, entity, transaction, false, commandTimeout, CommandType.Text);
                 }
 
@@ -218,7 +221,7 @@ namespace Agile.Data.Extensions
                 // defaultValue need for identify type of parameter
                 var defaultValue = entity.GetType().GetProperty(triggerIdentityColumn.PropertyInfo.Name).GetValue(entity, null);
                 dynamicParameters.Add("IdOutParam", direction: ParameterDirection.Output, value: defaultValue);
-                DapperExtensions.DebugSql(sql, dynamicParameters);
+                _sqlLoger.DebugSql(sql, dynamicParameters);
                 connection.Execute(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text);
 
                 var value = dynamicParameters.Get<object>(SqlGenerator.Configuration.Dialect.ParameterPrefix + "IdOutParam");
@@ -227,7 +230,7 @@ namespace Agile.Data.Extensions
             }
             else
             {
-                DapperExtensions.DebugSql(sql, entity);
+                _sqlLoger.DebugSql(sql, entity);
                 connection.Execute(sql, entity, transaction, commandTimeout, CommandType.Text);
             }
 
@@ -269,7 +272,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return connection.Execute(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
         }
 
@@ -295,7 +298,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return await connection.ExecuteAsync(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
         }
 
@@ -320,7 +323,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return connection.Execute(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
         }
 
@@ -345,7 +348,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return await connection.ExecuteAsync(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
         }
 
@@ -392,7 +395,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return (int)connection.Query(sql, dynamicParameters, transaction, false, commandTimeout, CommandType.Text).Single().Total;
         }
 
@@ -407,7 +410,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return (int)(await connection.QueryAsync(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text)).Single().Total;
         }
 
@@ -542,7 +545,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return connection.Query<T>(sql, dynamicParameters, transaction, buffered, commandTimeout, CommandType.Text);
         }
 
@@ -555,7 +558,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return connection.Query<T>(sql, dynamicParameters, transaction, buffered, commandTimeout, CommandType.Text);
         }
 
@@ -568,7 +571,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return connection.Query<T>(sql, dynamicParameters, transaction, buffered, commandTimeout, CommandType.Text);
         }
 
@@ -581,7 +584,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return connection.Execute(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
         }
         protected async Task<bool> DeleteAsync<T>(IDbConnection connection, IClassMapper classMap, IPredicate predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName) where T : class
@@ -593,7 +596,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return await connection.ExecuteAsync(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text) > 0;
         }
 
@@ -606,7 +609,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return await connection.QueryAsync<T>(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text);
         }
 
@@ -619,7 +622,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return await connection.QueryAsync<T>(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text);
         }
 
@@ -632,7 +635,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql, dynamicParameters);
+            _sqlLoger.DebugSql(sql, dynamicParameters);
             return await connection.QueryAsync<T>(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text);
         }
 
@@ -756,7 +759,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql.ToString(), dynamicParameters);
+            _sqlLoger.DebugSql(sql.ToString(), dynamicParameters);
             SqlMapper.GridReader grid = connection.QueryMultiple(sql.ToString(), dynamicParameters, transaction, commandTimeout, CommandType.Text);
             return new GridReaderResultReader(grid);
         }
@@ -810,7 +813,7 @@ namespace Agile.Data.Extensions
             {
                 dynamicParameters.Add(parameter.Key, parameter.Value);
             }
-            DapperExtensions.DebugSql(sql.ToString(), dynamicParameters);
+            _sqlLoger.DebugSql(sql.ToString(), dynamicParameters);
             SqlMapper.GridReader grid = await connection.QueryMultipleAsync(sql.ToString(), dynamicParameters, transaction, commandTimeout, CommandType.Text);
             return new GridReaderResultReader(grid);
         }
@@ -834,7 +837,7 @@ namespace Agile.Data.Extensions
                 {
                     dynamicParameters.Add(parameter.Key, parameter.Value);
                 }
-                DapperExtensions.DebugSql(sql, dynamicParameters);
+                _sqlLoger.DebugSql(sql, dynamicParameters);
                 SqlMapper.GridReader queryResult = await connection.QueryMultipleAsync(sql, dynamicParameters, transaction, commandTimeout, CommandType.Text);
                 items.Add(queryResult);
             }
