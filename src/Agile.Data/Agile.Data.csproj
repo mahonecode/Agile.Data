@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.1.5</Version>
+    <Version>2.2.0</Version>
     <Description>dapper extension micro-orm sql</Description>
-    <PackageTags>dapper extension micro-orm sql</PackageTags>
-    <PackageReleaseNotes>dapper extension micro-orm sql</PackageReleaseNotes>
+    <PackageTags>dapper extension micro-orm sql lambda</PackageTags>
+    <PackageReleaseNotes>dapper extension micro-orm sql lambda</PackageReleaseNotes>
     <Authors>fengyanfei</Authors>
     <Company>fengyanfei</Company>
     <Copyright>fengyanfei</Copyright>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -57,7 +58,7 @@ namespace Agile.Data.Extensions
             {
                 if (_instanceFactory == null)
                 {
-                    _instanceFactory = config => new DapperImplementor(new SqlGeneratorImpl(config), config.SqlLoger);
+                    _instanceFactory = config => new DapperImplementor(new SqlGeneratorImpl(config), config.ConnConfig);
                 }
 
                 return _instanceFactory;
@@ -493,6 +494,85 @@ namespace Agile.Data.Extensions
         }
         #endregion
 
+
+        #region Expression
+        /// <summary>
+        /// 统计数量
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static int CountByExpression<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return Instance.CountByExpression<T>(connection, whereExp, tableName, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static bool DeleteByExpression<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return Instance.DeleteByExpression<T>(connection, whereExp, tableName, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// 更新扩展，部分更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="entity"></param>
+        /// <param name="updateExp"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public static bool UpdateByExpression<T>(this IDbConnection connection, T entity, Expression<Func<T, object>> updateExp, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return Instance.UpdateByExpression<T>(connection, entity, updateExp, whereExp, tableName, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        ///  获取单项扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="con"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public static T GetByExpression<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            return Instance.GetByExpression<T>(connection, whereExp, tableName, transaction, commandTimeout);
+        }
+
+        /// <summary>
+        /// 获取列表扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="buffered"></param>
+        /// <returns></returns>
+        public static IEnumerable<T> GetListByExpression<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = true) where T : class
+        {
+            return Instance.GetListByExpression<T>(connection, whereExp, tableName, transaction, commandTimeout, buffered);
+        }
+
+        #endregion
 
 
         #region helper

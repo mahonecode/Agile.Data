@@ -10,12 +10,10 @@ namespace Agile.Data
     public class AgileClient
     {
         private ConnectionConfig CurrentConnectionConfig { get; set; }
-        private SqlLoger SqlLoger { get; set; }
 
         public AgileClient(ConnectionConfig config)
         {
             this.CurrentConnectionConfig = config;
-            SqlLoger = new SqlLoger(config);
         }
 
         /// <summary>
@@ -40,17 +38,17 @@ namespace Agile.Data
             {
                 case DatabaseType.MySql:
                     DapperExtensions.SqlDialect = new MySqlDialect();
-                    DapperExtensions.Configuration.SqlLoger = SqlLoger;
+                    DapperExtensions.Configuration.ConnConfig = CurrentConnectionConfig;
                     conn = new MySqlConnection(this.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.SqlServer:
                     DapperExtensions.SqlDialect = new SqlServerDialect();
-                    DapperExtensions.Configuration.SqlLoger = SqlLoger;
+                    DapperExtensions.Configuration.ConnConfig = CurrentConnectionConfig;
                     conn = new SqlConnection(this.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.Oracle:
                     DapperExtensions.SqlDialect = new OracleDialect();
-                    DapperExtensions.Configuration.SqlLoger = SqlLoger;
+                    DapperExtensions.Configuration.ConnConfig = CurrentConnectionConfig;
                     conn = new OracleConnection(this.CurrentConnectionConfig.ConnectionString);
                     break;
                 case DatabaseType.Sqlite:
@@ -86,7 +84,7 @@ namespace Agile.Data
         /// <returns></returns>
         public IDbSession CreateSession()
         {
-            IDbSession session = new DbSession(this.CreateDbConnection(), SqlLoger);
+            IDbSession session = new DbSession(this.CreateDbConnection(), CurrentConnectionConfig);
             return session;
         }
 
@@ -98,7 +96,7 @@ namespace Agile.Data
         /// <returns></returns>
         public IDbSession CreateSession(IDbConnection conn, IDbTransaction trans)
         {
-            IDbSession session = new DbSession(conn, trans, SqlLoger);
+            IDbSession session = new DbSession(conn, trans, CurrentConnectionConfig);
             return session;
         }
 

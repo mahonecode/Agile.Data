@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Agile.Data
 {
@@ -40,6 +41,26 @@ namespace Agile.Data
         /// 回滚事务
         /// </summary>
         void Rollback();
+
+
+        #region count
+        /// <summary>
+        /// 总数量
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        int Count<T>(object predicate = null) where T : class;
+
+        /// <summary>
+        /// 总数量扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        int CountByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
+        #endregion
 
 
         #region insert update delete
@@ -77,6 +98,17 @@ namespace Agile.Data
         bool Update<T>(T entity, object predicate) where T : class;
 
         /// <summary>
+        /// 更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="update"></param>
+        /// <param name="where"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        bool UpdateByExpression<T>(T entity, Expression<Func<T, object>> update, Expression<Func<T, bool>> where, string tableName = null) where T : class;
+
+        /// <summary>
         /// 删除单条记录
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -91,19 +123,20 @@ namespace Agile.Data
         /// <param name="predicate"></param>
         /// <returns></returns>
         bool Delete<T>(object predicate) where T : class;
-        #endregion
 
-        #region count
         /// <summary>
-        /// 总数量
+        /// 删除
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="predicate"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
         /// <returns></returns>
-        int Count<T>(object predicate = null) where T : class;
+        bool DeleteByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
         #endregion
 
-        #region get
+
+
+            #region get
         /// <summary>
         /// 查询单个实体
         /// </summary>
@@ -111,9 +144,18 @@ namespace Agile.Data
         /// <param name="primaryId"></param>
         /// <returns></returns>
         T Get<T>(dynamic primaryId) where T : class;
+
+        /// <summary>
+        /// 查询单个实体
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        T GetByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
         #endregion
 
-        #region getlist
+            #region getlist
         /// <summary>
         /// 查询实体集合
         /// </summary>
@@ -123,9 +165,19 @@ namespace Agile.Data
         /// <param name="buffered"></param>
         /// <returns></returns>
         IEnumerable<T> GetList<T>(object predicate = null, IList<ISort> sort = null, bool buffered = true) where T : class;
+
+        /// <summary>
+        /// 查询实体集合
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="buffered"></param>
+        /// <returns></returns>
+        IEnumerable<T> GetListByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null, bool buffered = true) where T : class;
         #endregion
 
-        #region getpage
+            #region getpage
         /// <summary>
         /// 查询分页实体集合
         /// </summary>
@@ -362,15 +414,6 @@ namespace Agile.Data
         /// <param name="param"></param>
         /// <returns></returns>
         int ExecuteProcedure(string procName, dynamic param = null);
-
-        /// <summary>
-        /// 执行存储过程
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="procName"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        IEnumerable<T> ExecuteProcedure<T>(string procName, dynamic param);
         #endregion
     }
 
@@ -379,6 +422,7 @@ namespace Agile.Data
     /// </summary>
     public class DbSession : IDbSession
     {
+        private ConnectionConfig _connectionConfig;
         private SqlLoger _sqlLoger;
 
         /// <summary>
@@ -395,10 +439,12 @@ namespace Agile.Data
         /// 构造方法
         /// </summary>
         /// <param name="conn">连接</param>
-        internal DbSession(IDbConnection conn, SqlLoger sqlLoger)
+        internal DbSession(IDbConnection conn, ConnectionConfig connConfig)
         {
             Connection = conn;
-            _sqlLoger = sqlLoger;
+
+            _connectionConfig = connConfig;
+            _sqlLoger = new SqlLoger(connConfig);
         }
 
         /// <summary>
@@ -406,11 +452,13 @@ namespace Agile.Data
         /// </summary>
         /// <param name="conn">连接</param>
         /// <param name="trans">事务</param>
-        internal DbSession(IDbConnection conn, IDbTransaction trans, SqlLoger sqlLoger)
+        internal DbSession(IDbConnection conn, IDbTransaction trans, ConnectionConfig connConfig)
         {
             Connection = conn;
             Transaction = trans;
-            _sqlLoger = sqlLoger;
+
+            _connectionConfig = connConfig;
+            _sqlLoger = new SqlLoger(connConfig);
         }
 
         /// <summary>
@@ -474,6 +522,25 @@ namespace Agile.Data
 
 
 
+        #region Micro-ORM
+
+        #region count
+        /// <summary>
+        /// 统计记录总数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public int Count<T>(object predicate = null) where T : class
+        {
+            return Connection.Count<T>(predicate, Transaction);
+        }
+
+        public int CountByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
+        {
+            return Connection.CountByExpression<T>(whereExp, tableName, Transaction);
+        }
+        #endregion
 
         #region insert update delete
 
@@ -529,6 +596,20 @@ namespace Agile.Data
             return isOk;
         }
 
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entity"></param>
+        /// <param name="update"></param>
+        /// <param name="where"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public bool UpdateByExpression<T>(T entity, Expression<Func<T, object>> update, Expression<Func<T, bool>> where, string tableName = null) where T : class
+        {
+            bool isOk = Connection.UpdateByExpression<T>(entity, update, where, tableName, Transaction);
+            return isOk;
+        }
 
         /// <summary>
         /// 删除单条记录
@@ -553,20 +634,18 @@ namespace Agile.Data
         {
             return Connection.Delete<T>(predicate, Transaction);
         }
-        #endregion
 
-        #region count
         /// <summary>
-        /// 统计记录总数
+        /// 删除
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="predicate"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
         /// <returns></returns>
-        public int Count<T>(object predicate = null) where T : class
+        public bool DeleteByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
         {
-            return Connection.Count<T>(predicate, Transaction);
+            return Connection.DeleteByExpression<T>(whereExp, tableName, Transaction);
         }
-
         #endregion
 
 
@@ -582,6 +661,10 @@ namespace Agile.Data
             return Connection.Get<T>(primaryId as object, Transaction);
         }
 
+        public T GetByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
+        {
+            return Connection.GetByExpression<T>(whereExp, tableName, Transaction);
+        }
         #endregion
 
         #region getlist
@@ -596,6 +679,17 @@ namespace Agile.Data
         public IEnumerable<T> GetList<T>(object predicate = null, IList<ISort> sort = null, bool buffered = true) where T : class
         {
             return Connection.GetList<T>(predicate, sort, Transaction, null, buffered);
+        }
+
+
+        /// <summary>
+        ///   列表查询
+        /// </summary>
+        /// <param name="whereExp"></param>
+        /// <returns></returns>
+        public IEnumerable<T> GetListByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null, bool buffered = true) where T : class
+        {
+            return Connection.GetListByExpression<T>( whereExp,  tableName , Transaction);
         }
         #endregion
 
@@ -645,11 +739,11 @@ namespace Agile.Data
         }
         #endregion
 
+        #endregion
 
 
 
-
-        #region SQLCommand   SQLMap
+        #region SQL   SQLMap
         /// <summary>
         /// 执行sql语句
         /// </summary>
@@ -984,22 +1078,26 @@ namespace Agile.Data
         /// <returns></returns>
         public int ExecuteProcedure(string procName, dynamic param = null)
         {
+            //注意 前台需要传入 DynamicParameters 参数
             _sqlLoger.DebugSql(procName, param);
             return Connection.Execute(procName, param as object, Transaction, null, CommandType.StoredProcedure);
-        }
 
-        /// <summary>
-        /// 执行存储过程 根据条件筛选数据集合
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="procName"></param>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public IEnumerable<T> ExecuteProcedure<T>(string procName, dynamic param)
-        {
-            _sqlLoger.DebugSql(procName, param);
-            IEnumerable<T> list = Connection.Query<T>(procName, param as object, Transaction, true, null, CommandType.StoredProcedure);
-            return list;
+            //针对复杂类型的 存储过程，还是在业务里面扩展一个方法自己控制比较方便，如下案例
+            //使用ado.net基础方法操作存储过程
+            //using (var conn = Repository.DBSession.Connection)
+            //{
+            //    conn.Open();
+            //    OracleCommand cmd = new OracleCommand("pro_sto_bal", (OracleConnection)conn);
+            //    cmd.CommandType = CommandType.StoredProcedure;
+            //    cmd.Parameters.Add(new OracleParameter("v_n", OracleDbType.Varchar2,32, "2019", ParameterDirection.Input));
+            //    cmd.Parameters.Add(new OracleParameter("v_y", OracleDbType.Varchar2,32, "06", ParameterDirection.Input));
+            //    cmd.Parameters.Add(new OracleParameter("poret", OracleDbType.Int32,32,"", ParameterDirection.Output));
+            //    cmd.Parameters.Add(new OracleParameter("pomsg", OracleDbType.Varchar2,32,"", ParameterDirection.Output));
+            //    cmd.ExecuteNonQuery();
+            //    //取出输出参数值
+            //    var v1 = cmd.Parameters["poret"].Value;
+            //    var v2 = cmd.Parameters["pomsg"].Value;
+            //}
         }
         #endregion
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Dynamic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,6 +79,69 @@ namespace Agile.Data.Extensions
 
         Task<IMultipleResultReader> GetMultipleAsync(IDbConnection connection, MultiplePredicate predicate, IDbTransaction transaction, int? commandTimeout, string tableName, string schemaName);
         #endregion
+
+        #region Expression
+        /// <summary>
+        /// 统计数量
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        int CountByExpression<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class;
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        bool DeleteByExpression<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class;
+
+        /// <summary>
+        /// 更新扩展，部分更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="entity"></param>
+        /// <param name="updateExp"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        bool UpdateByExpression<T>(IDbConnection connection, T entity, Expression<Func<T, object>> updateExp, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class;
+
+        /// <summary>
+        ///  获取单项扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="con"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        T GetByExpression<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class;
+
+        /// <summary>
+        /// 获取列表扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="buffered"></param>
+        /// <returns></returns>
+        IEnumerable<T> GetListByExpression<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = true) where T : class;
+        #endregion
     }
 
 
@@ -87,13 +151,14 @@ namespace Agile.Data.Extensions
     public class DapperImplementor : IDapperImplementor
     {
         public ISqlGenerator SqlGenerator { get; private set; }
-
+        private ConnectionConfig _connectionConfig;
         private SqlLoger _sqlLoger;
 
-        public DapperImplementor(ISqlGenerator sqlGenerator, SqlLoger sqlLoger)
+        public DapperImplementor(ISqlGenerator sqlGenerator, ConnectionConfig connConfig)
         {
             SqlGenerator = sqlGenerator;
-            _sqlLoger = sqlLoger;
+            _connectionConfig = connConfig;
+            _sqlLoger = new SqlLoger(connConfig);
         }
                        
 
@@ -531,7 +596,166 @@ namespace Agile.Data.Extensions
         #endregion
 
 
+        #region Expression
+        /// <summary>
+        /// 统计数量
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public int CountByExpression<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            if (string.IsNullOrEmpty(tableName))
+                tableName = typeof(T).Name;
 
+            var sqlVisitor = new SqlExpressionVisitor();
+            var whereSql = GetVisitExpressSql(sqlVisitor, whereExp, SqlVistorType.Where);
+
+            var sql = string.Concat("SELECT COUNT(*) AS Total FROM ", tableName, whereSql); 
+             var paras = GetExcuteParas(null, sqlVisitor);
+            _sqlLoger.DebugSql(sql, paras);
+            return (int)connection.Query(sql, paras, transaction, false, commandTimeout, CommandType.Text).Single().Total;
+        }
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public bool DeleteByExpression<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            if (string.IsNullOrEmpty(tableName))
+                tableName = typeof(T).Name;
+
+            var sqlVisitor = new SqlExpressionVisitor();
+            var whereSql = GetVisitExpressSql(sqlVisitor, whereExp, SqlVistorType.Where);
+
+            var sql = string.Concat("DELETE FROM ", tableName, whereSql);
+            var paras = GetExcuteParas(null, sqlVisitor);
+            _sqlLoger.DebugSql(sql, paras);
+            return connection.Execute(sql, paras, transaction, commandTimeout, CommandType.Text) > 0;
+        }
+
+        /// <summary>
+        /// 更新扩展，部分更新
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="entity"></param>
+        /// <param name="updateExp"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <returns></returns>
+        public bool UpdateByExpression<T>(IDbConnection connection, T entity, Expression<Func<T, object>> updateExp, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            if (string.IsNullOrEmpty(tableName))
+                tableName = typeof(T).Name;
+
+            var visitor = new SqlExpressionVisitor();
+
+            var updateSql = GetVisitExpressSql(visitor, updateExp, SqlVistorType.Update);
+            var whereSql = GetVisitExpressSql(visitor, whereExp, SqlVistorType.Where);
+            var sql = string.Concat("UPDATE ", tableName, " SET ", updateSql, whereSql);
+
+            var paras = GetExcuteParas(entity, visitor);
+            _sqlLoger.DebugSql(sql, paras);
+            return connection.Execute(sql, paras, transaction, commandTimeout, CommandType.Text) > 0;
+        }
+
+        /// <summary>
+        ///  获取单项扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="con"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public T GetByExpression<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        {
+            if (string.IsNullOrEmpty(tableName))
+                tableName = typeof(T).Name;
+
+            var sqlVisitor = new SqlExpressionVisitor();
+            var whereSql = GetVisitExpressSql(sqlVisitor, whereExp, SqlVistorType.Where);
+
+            var sql = string.Concat("SELECT * FROM ", tableName, whereSql);
+            var paras = GetExcuteParas(null, sqlVisitor);
+            _sqlLoger.DebugSql(sql, paras);
+            return connection.QuerySingleOrDefault<T>(sql, paras, transaction, commandTimeout, CommandType.Text);
+        }
+
+        /// <summary>
+        /// 获取列表扩展
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="whereExp"></param>
+        /// <param name="tableName"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandTimeout"></param>
+        /// <param name="buffered"></param>
+        /// <returns></returns>
+        public IEnumerable<T> GetListByExpression<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = true) where T : class
+        {
+            if (string.IsNullOrEmpty(tableName))
+                tableName = typeof(T).Name;
+
+            var sqlVisitor = new SqlExpressionVisitor();
+            var whereSql = GetVisitExpressSql(sqlVisitor, whereExp, SqlVistorType.Where);
+
+            var sql = string.Concat("SELECT * FROM ", tableName, whereSql);
+            var paras = GetExcuteParas(null, sqlVisitor);
+            _sqlLoger.DebugSql(sql, paras);
+            return connection.Query<T>(sql, paras, transaction, buffered, commandTimeout, CommandType.Text);
+        }
+
+
+
+        /// <summary>
+        ///   处理where条件表达式
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="exp"></param>
+        /// <param name="visType"></param>
+        private static string GetVisitExpressSql(SqlExpressionVisitor visitor, Expression exp, SqlVistorType visType)
+        {
+            if (visType == SqlVistorType.Update)
+            {
+                var updateFlag = new SqlVistorFlag(SqlVistorType.Update);
+                visitor.Visit(exp, updateFlag);
+                return updateFlag.Sql;
+            }
+
+            var whereFlag = new SqlVistorFlag(SqlVistorType.Where);
+            visitor.Visit(exp, whereFlag);
+            var sql = string.Concat(" WHERE ", whereFlag.Sql);
+            return sql;
+        }
+
+        private static object GetExcuteParas(object entity, SqlExpressionVisitor visitor)
+        {
+            if (!visitor.Parameters.Any())
+                return entity;
+
+            var paras = new DynamicParameters(visitor.Parameters);
+            if (entity == null || !visitor.Properties.Any())
+                return paras;
+
+            paras.AddDynamicParams(entity);
+            return paras;
+        }
+        #endregion
 
 
         #region Helpers

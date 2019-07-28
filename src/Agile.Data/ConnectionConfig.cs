@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dapper;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -45,7 +46,23 @@ namespace Agile.Data
         {
             if (_currentConnectionConfig != null && _currentConnectionConfig.IsEnableLogEvent)
             {
-                _currentConnectionConfig.OnLogExecuted?.Invoke(sql, param);
+                if(param is DynamicParameters)
+                {
+                    Dictionary<string, object> dicParam = new Dictionary<string, object>();
+                    var dyParameters = (DynamicParameters)param;
+                    if (dyParameters != null)
+                    {
+                        foreach (var item in dyParameters.ParameterNames)
+                        {
+                            dicParam.Add(item, dyParameters.Get<object>(item));
+                        }
+                    }
+                    _currentConnectionConfig.OnLogExecuted?.Invoke(sql, dicParam);
+                }
+                else
+                {
+                    _currentConnectionConfig.OnLogExecuted?.Invoke(sql, param);
+                }                
             }
         }
     }

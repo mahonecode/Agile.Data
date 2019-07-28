@@ -8,7 +8,7 @@ namespace Agile.Data.Extensions
 {
     public interface IDapperExtensionsConfiguration
     {
-        SqlLoger SqlLoger { get; set; }
+        ConnectionConfig ConnConfig { get; set; }
         Type DefaultMapper { get; }
         IList<Assembly> MappingAssemblies { get; }
         ISqlDialect Dialect { get; }
@@ -50,7 +50,7 @@ namespace Agile.Data.Extensions
         //    NowTime = DateTime.Now;
         //}
 
-        public SqlLoger SqlLoger { get; set; }
+        public ConnectionConfig ConnConfig { get; set; }
 
         public Type DefaultMapper { get; private set; }
         public IList<Assembly> MappingAssemblies { get; private set; }
