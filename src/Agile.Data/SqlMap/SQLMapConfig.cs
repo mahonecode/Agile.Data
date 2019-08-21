@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Agile.Data.SqlMap
@@ -9,8 +10,18 @@ namespace Agile.Data.SqlMap
     /// </summary>
     public class SQLMapConfig
     {
+        public SQLMapConfig()
+        {
+            SQLMapFileFolder = Path.Combine("wwwroot", "SqlMap");
+        }
+
+        public SQLMapConfig(string relativePath)
+        {
+            SQLMapFileFolder = relativePath;
+        }
+
         public string Code { get; set; }
-        public string SQLMapFileFolder { get; set; } = "SqlMap";
+        public string SQLMapFileFolder { get; set; }
         public string SQLMapFileName { get; set; }
         public Dictionary<string, object> Parameters { get; set; }
 

@@ -668,8 +668,8 @@ namespace Agile.Data.Extensions
             var whereSql = GetVisitExpressSql(visitor, whereExp, SqlVistorType.Where);
             var sql = string.Concat("UPDATE ", tableName, " SET ", updateSql, whereSql);
 
-            var paras = GetExcuteParas(entity, visitor);
-            _sqlLoger.DebugSql(sql, paras);
+            var paras = GetExcuteParas(entity, visitor);               
+            _sqlLoger.DebugSql(sql, visitor.Parameters);
             return connection.Execute(sql, paras, transaction, commandTimeout, CommandType.Text) > 0;
         }
 

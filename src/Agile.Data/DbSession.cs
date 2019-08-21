@@ -1115,21 +1115,17 @@ namespace Agile.Data
                 try
                 {
                     DataTable dt = new DataTable();
-                    bool init = false;
                     dt.BeginLoadData();
-                    object[] vals = new object[0];
+                    //表结构
+                    int fieldCount = dReader.FieldCount;
+                    for (int i = 0; i < fieldCount; i++)
+                    {
+                        dt.Columns.Add(dReader.GetName(i), dReader.GetFieldType(i));
+                    }
+                    object[] vals = new object[fieldCount];
+                    //表数据
                     while (dReader.Read())
                     {
-                        if (!init)
-                        {
-                            init = true;
-                            int fieldCount = dReader.FieldCount;
-                            for (int i = 0; i < fieldCount; i++)
-                            {
-                                dt.Columns.Add(dReader.GetName(i), dReader.GetFieldType(i));
-                            }
-                            vals = new object[fieldCount];
-                        }
                         dReader.GetValues(vals);
                         dt.LoadDataRow(vals, true);
                     }
