@@ -506,9 +506,9 @@ namespace Agile.Data.Extensions
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static int CountByExpression<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static int Count<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            return Instance.CountByExpression<T>(connection, whereExp, tableName, transaction, commandTimeout);
+            return Instance.Count<T>(connection, whereExp, tableName, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -521,9 +521,9 @@ namespace Agile.Data.Extensions
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static bool DeleteByExpression<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static bool Delete<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            return Instance.DeleteByExpression<T>(connection, whereExp, tableName, transaction, commandTimeout);
+            return Instance.Delete<T>(connection, whereExp, tableName, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -538,9 +538,9 @@ namespace Agile.Data.Extensions
         /// <param name="transaction"></param>
         /// <param name="commandTimeout"></param>
         /// <returns></returns>
-        public static bool UpdateByExpression<T>(this IDbConnection connection, T entity, Expression<Func<T, object>> updateExp, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static bool Update<T>(this IDbConnection connection, T entity, Expression<Func<T, object>> updateExp, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            return Instance.UpdateByExpression<T>(connection, entity, updateExp, whereExp, tableName, transaction, commandTimeout);
+            return Instance.Update<T>(connection, entity, updateExp, whereExp, tableName, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -551,9 +551,9 @@ namespace Agile.Data.Extensions
         /// <param name="whereExp"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static T GetByExpression<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
+        public static T Get<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
-            return Instance.GetByExpression<T>(connection, whereExp, tableName, transaction, commandTimeout);
+            return Instance.Get<T>(connection, whereExp, tableName, transaction, commandTimeout);
         }
 
         /// <summary>
@@ -567,9 +567,9 @@ namespace Agile.Data.Extensions
         /// <param name="commandTimeout"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        public static IEnumerable<T> GetListByExpression<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = true) where T : class
+        public static IEnumerable<T> GetList<T>(this IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = true) where T : class
         {
-            return Instance.GetListByExpression<T>(connection, whereExp, tableName, transaction, commandTimeout, buffered);
+            return Instance.GetList<T>(connection, whereExp, tableName, transaction, commandTimeout, buffered);
         }
 
         #endregion
