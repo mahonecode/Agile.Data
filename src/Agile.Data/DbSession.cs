@@ -59,7 +59,7 @@ namespace Agile.Data
         /// <param name="whereExp"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        int CountByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
+        int Count<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
         #endregion
 
 
@@ -106,7 +106,7 @@ namespace Agile.Data
         /// <param name="where"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        bool UpdateByExpression<T>(T entity, Expression<Func<T, object>> update, Expression<Func<T, bool>> where, string tableName = null) where T : class;
+        bool Update<T>(T entity, Expression<Func<T, object>> update, Expression<Func<T, bool>> where, string tableName = null) where T : class;
 
         /// <summary>
         /// 删除单条记录
@@ -131,7 +131,7 @@ namespace Agile.Data
         /// <param name="whereExp"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        bool DeleteByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
+        bool Delete<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
         #endregion
 
 
@@ -152,7 +152,7 @@ namespace Agile.Data
         /// <param name="whereExp"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        T GetByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
+        T Get<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class;
         #endregion
 
             #region getlist
@@ -174,7 +174,7 @@ namespace Agile.Data
         /// <param name="tableName"></param>
         /// <param name="buffered"></param>
         /// <returns></returns>
-        IEnumerable<T> GetListByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null, bool buffered = true) where T : class;
+        IEnumerable<T> GetList<T>(Expression<Func<T, bool>> whereExp, string tableName = null, bool buffered = true) where T : class;
         #endregion
 
             #region getpage
@@ -536,9 +536,9 @@ namespace Agile.Data
             return Connection.Count<T>(predicate, Transaction);
         }
 
-        public int CountByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
+        public int Count<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
         {
-            return Connection.CountByExpression<T>(whereExp, tableName, Transaction);
+            return Connection.Count<T>(whereExp, tableName, Transaction);
         }
         #endregion
 
@@ -605,9 +605,9 @@ namespace Agile.Data
         /// <param name="where"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public bool UpdateByExpression<T>(T entity, Expression<Func<T, object>> update, Expression<Func<T, bool>> where, string tableName = null) where T : class
+        public bool Update<T>(T entity, Expression<Func<T, object>> update, Expression<Func<T, bool>> where, string tableName = null) where T : class
         {
-            bool isOk = Connection.UpdateByExpression<T>(entity, update, where, tableName, Transaction);
+            bool isOk = Connection.Update<T>(entity, update, where, tableName, Transaction);
             return isOk;
         }
 
@@ -642,9 +642,9 @@ namespace Agile.Data
         /// <param name="whereExp"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public bool DeleteByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
+        public bool Delete<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
         {
-            return Connection.DeleteByExpression<T>(whereExp, tableName, Transaction);
+            return Connection.Delete<T>(whereExp, tableName, Transaction);
         }
         #endregion
 
@@ -661,9 +661,9 @@ namespace Agile.Data
             return Connection.Get<T>(primaryId as object, Transaction);
         }
 
-        public T GetByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
+        public T Get<T>(Expression<Func<T, bool>> whereExp, string tableName = null) where T : class
         {
-            return Connection.GetByExpression<T>(whereExp, tableName, Transaction);
+            return Connection.Get<T>(whereExp, tableName, Transaction);
         }
         #endregion
 
@@ -687,9 +687,9 @@ namespace Agile.Data
         /// </summary>
         /// <param name="whereExp"></param>
         /// <returns></returns>
-        public IEnumerable<T> GetListByExpression<T>(Expression<Func<T, bool>> whereExp, string tableName = null, bool buffered = true) where T : class
+        public IEnumerable<T> GetList<T>(Expression<Func<T, bool>> whereExp, string tableName = null, bool buffered = true) where T : class
         {
-            return Connection.GetListByExpression<T>( whereExp,  tableName , Transaction);
+            return Connection.GetList<T>( whereExp,  tableName , Transaction);
         }
         #endregion
 
