@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.2.1</Version>
+    <Version>2.3.0</Version>
     <Description>dapper extension micro-orm sql sqlmap lambda</Description>
     <PackageTags>dapper extension micro-orm sql sqlmap lambda</PackageTags>
     <PackageReleaseNotes>dapper extension micro-orm sql sqlmap lambda</PackageReleaseNotes>
