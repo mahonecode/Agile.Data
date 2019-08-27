@@ -482,7 +482,7 @@ namespace Agile.Data.Extensions
                 case DatabaseType.SqlServer:
                     return string.Concat('[', name, ']');
                 case DatabaseType.Oracle:
-                    return string.Concat('"', name, '"');
+                    return string.Concat('"', name.ToUpper(), '"');//这里是oracle默认大写，加了双引号，就大小写敏感了，这样改可能会导致其他兼容问题
             }
             return name;
         }
