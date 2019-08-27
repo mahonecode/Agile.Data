@@ -610,15 +610,15 @@ namespace Agile.Data.Extensions
         public int Count<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             if (string.IsNullOrEmpty(tableName))
-                tableName = typeof(T).Name;
+                tableName = typeof(T).GetTableName();
 
             var sqlVisitor = new SqlExpressionVisitor();
             var whereSql = GetVisitExpressSql(sqlVisitor, whereExp, SqlVistorType.Where);
 
-            var sql = string.Concat("SELECT COUNT(*) AS Total FROM ", tableName, whereSql); 
+            var sql = string.Concat("SELECT COUNT(*) FROM ", tableName, whereSql); 
              var paras = GetExcuteParas(null, sqlVisitor);
             _sqlLoger.DebugSql(sql, paras);
-            return (int)connection.Query(sql, paras, transaction, false, commandTimeout, CommandType.Text).Single().Total;
+            return (int)connection.Query(sql, paras, transaction, false, commandTimeout, CommandType.Text).Single();
         }
 
         /// <summary>
@@ -634,7 +634,7 @@ namespace Agile.Data.Extensions
         public bool Delete<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             if (string.IsNullOrEmpty(tableName))
-                tableName = typeof(T).Name;
+                tableName = typeof(T).GetTableName();
 
             var sqlVisitor = new SqlExpressionVisitor();
             var whereSql = GetVisitExpressSql(sqlVisitor, whereExp, SqlVistorType.Where);
@@ -660,7 +660,7 @@ namespace Agile.Data.Extensions
         public bool Update<T>(IDbConnection connection, T entity, Expression<Func<T, object>> updateExp, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             if (string.IsNullOrEmpty(tableName))
-                tableName = typeof(T).Name;
+                tableName = typeof(T).GetTableName();
 
             var visitor = new SqlExpressionVisitor();
 
@@ -684,7 +684,7 @@ namespace Agile.Data.Extensions
         public T Get<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null) where T : class
         {
             if (string.IsNullOrEmpty(tableName))
-                tableName = typeof(T).Name;
+                tableName = typeof(T).GetTableName();
 
             var sqlVisitor = new SqlExpressionVisitor();
             var whereSql = GetVisitExpressSql(sqlVisitor, whereExp, SqlVistorType.Where);
@@ -709,7 +709,7 @@ namespace Agile.Data.Extensions
         public IEnumerable<T> GetList<T>(IDbConnection connection, Expression<Func<T, bool>> whereExp, string tableName = null, IDbTransaction transaction = null, int? commandTimeout = null, bool buffered = true) where T : class
         {
             if (string.IsNullOrEmpty(tableName))
-                tableName = typeof(T).Name;
+                tableName = typeof(T).GetTableName();
 
             var sqlVisitor = new SqlExpressionVisitor();
             var whereSql = GetVisitExpressSql(sqlVisitor, whereExp, SqlVistorType.Where);

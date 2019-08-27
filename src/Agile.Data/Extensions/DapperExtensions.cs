@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -576,6 +578,23 @@ namespace Agile.Data.Extensions
 
 
         #region helper
+        /// <summary>
+        /// 获取表名称
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        internal static string GetTableName(this Type entity)
+        {
+            var attrs = entity.GetCustomAttributes(typeof(TableAttribute));
+            var attribute = attrs?.Count() > 0 ? (TableAttribute)attrs.First() : null;
+            var mTableName = string.Empty;
+            if (attribute == null)
+                mTableName = entity.Name;
+            else
+                mTableName = attribute.Name;
+            return mTableName;
+        }
+
         /// <summary>
         /// Gets the appropriate mapper for the specified type T. 
         /// If the mapper for the type is not yet created, a new mapper is generated from the mapper type specifed by DefaultMapper.
