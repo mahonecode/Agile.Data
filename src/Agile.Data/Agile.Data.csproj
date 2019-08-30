@@ -12,6 +12,8 @@
     <Copyright>fengyanfei</Copyright>
     <PackageProjectUrl>https://github.com/mahonecode/Agile.Data</PackageProjectUrl>
     <RepositoryUrl>https://github.com/mahonecode/Agile.Data</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
