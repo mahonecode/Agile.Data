@@ -16,7 +16,7 @@ namespace XUnitTestData
             string connectionString = "Data Source=127.0.0.1;Initial Catalog=dapper;User Id=sa;Password=123456;Persist Security Info=True;";
 
             var config = new ConnectionConfig { ConnectionString = connectionString, DbType = DatabaseType.SqlServer };
-            config.IsEnableLogEvent = false;//开启日志
+            config.IsEnableLogEvent = true;//开启日志
             config.OnLogExecuted = (sql, param) =>
             {
                 var strSql = sql;
@@ -28,11 +28,11 @@ namespace XUnitTestData
 
             var files = new List<string>
             {
-                ReadScriptFile("CreateAnimalTable"),
-                ReadScriptFile("CreateFooTable"),
-                ReadScriptFile("CreateMultikeyTable"),
-                ReadScriptFile("CreatePersonTable"),
-                ReadScriptFile("CreateCarTable")
+                ReadScriptFile("SqlServer","CreateAnimalTable"),
+                ReadScriptFile("SqlServer","CreateFooTable"),
+                ReadScriptFile("SqlServer","CreateMultikeyTable"),
+                ReadScriptFile("SqlServer","CreatePersonTable"),
+                ReadScriptFile("SqlServer","CreateCarTable")
             };
 
             foreach (var setupFile in files)
@@ -45,11 +45,12 @@ namespace XUnitTestData
         /// <summary>
         /// 读取初始化脚本
         /// </summary>
+        /// <param name="sql"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string ReadScriptFile(string name)
+        public string ReadScriptFile(string sql,string name)
         {
-            string fileName = GetType().Namespace + ".Sql." + name + ".sql";
+            string fileName = $"{GetType().Namespace}.{sql}.{name}.sql";
             using (Stream s = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(fileName))
             using (StreamReader sr = new StreamReader(s))
             {

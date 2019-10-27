@@ -7,19 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Sql\CreateAnimalTable.sql" />
-    <None Remove="Sql\CreateCarTable.sql" />
-    <None Remove="Sql\CreateFooTable.sql" />
-    <None Remove="Sql\CreateMultikeyTable.sql" />
-    <None Remove="Sql\CreatePersonTable.sql" />
+    <None Remove="SqlServer\CreateAnimalTable.sql" />
+    <None Remove="SqlServer\CreateCarTable.sql" />
+    <None Remove="SqlServer\CreateFooTable.sql" />
+    <None Remove="SqlServer\CreateMultikeyTable.sql" />
+    <None Remove="SqlServer\CreatePersonTable.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Sql\CreateAnimalTable.sql" />
-    <EmbeddedResource Include="Sql\CreateCarTable.sql" />
-    <EmbeddedResource Include="Sql\CreateFooTable.sql" />
-    <EmbeddedResource Include="Sql\CreateMultikeyTable.sql" />
-    <EmbeddedResource Include="Sql\CreatePersonTable.sql" />
+    <EmbeddedResource Include="SqlServer\CreateAnimalTable.sql" />
+    <EmbeddedResource Include="SqlServer\CreateCarTable.sql" />
+    <EmbeddedResource Include="SqlServer\CreateFooTable.sql" />
+    <EmbeddedResource Include="SqlServer\CreateMultikeyTable.sql" />
+    <EmbeddedResource Include="SqlServer\CreatePersonTable.sql" />
   </ItemGroup>
 
   <ItemGroup>
