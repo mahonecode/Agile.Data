@@ -1,7 +1,7 @@
 ﻿using Agile.Data.Extensions;
 
 
-namespace XUnitTestData.Model
+namespace XUnitTestSqlServer.Model
 {
     public class Multikey
     {

@@ -1,4 +1,4 @@
-﻿namespace XUnitTestData.Model
+﻿namespace XUnitTestSqlServer.Model
 {
     class Car
     {

@@ -7,22 +7,22 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-using XUnitTestData.Model;
+using XUnitTestSqlServer.Model;
 
-namespace XUnitTestData
+namespace XUnitTestSqlServer
 {
     public class TimerFixture 
     {
         private static int cnt = 10000;
 
 
-        public class InsertTimes : IClassFixture<BaseFixture>
+        public class InsertTimes : IClassFixture<SqlServerBaseFixture>
         {
-            BaseFixture database;
+            SqlServerBaseFixture Base;
 
-            public InsertTimes(BaseFixture data)
+            public InsertTimes(SqlServerBaseFixture sqlserverbase)
             {
-                database = data;
+                Base = sqlserverbase;
             }
 
             [Fact]
@@ -35,7 +35,7 @@ namespace XUnitTestData
                                    DateCreated = DateTime.Now,
                                    Active = true
                                };
-                database.agileClient.DBSession.Insert(p);
+                Base.agileClient.DBSession.Insert(p);
                 DateTime start = DateTime.Now;
                 List<int> ids = new List<int>();
                 for (int i = 0; i < cnt; i++)
@@ -47,7 +47,7 @@ namespace XUnitTestData
                                         DateCreated = DateTime.Now,
                                         Active = true
                                     };
-                    database.agileClient.DBSession.Insert(p2);
+                    Base.agileClient.DBSession.Insert(p2);
                     ids.Add(p2.Id);
                 }
 
@@ -66,7 +66,7 @@ namespace XUnitTestData
                                    DateCreated = DateTime.Now,
                                    Active = true
                                };
-                database.agileClient.DBSession.Insert(p);
+                Base.agileClient.DBSession.Insert(p);
                 DateTime start = DateTime.Now;
                 List<int> ids = new List<int>();
                 for (int i = 0; i < cnt; i++)
@@ -78,7 +78,7 @@ namespace XUnitTestData
                                         DateCreated = DateTime.Now,
                                         Active = true
                                     };
-                    var id = database.agileClient.DBSession.Insert(p2);
+                    var id = Base.agileClient.DBSession.Insert(p2);
                     ids.Add(id);
                 }
 
@@ -91,13 +91,13 @@ namespace XUnitTestData
             public void GuidKey_UsingEntity()
             {
                 Animal a = new Animal { Name = "Name" };
-                database.agileClient.DBSession.Insert(a);
+                Base.agileClient.DBSession.Insert(a);
                 DateTime start = DateTime.Now;
                 List<Guid> ids = new List<Guid>();
                 for (int i = 0; i < cnt; i++)
                 {
                     Animal a2 = new Animal { Name = "Name" + i };
-                    database.agileClient.DBSession.Insert(a2);
+                    Base.agileClient.DBSession.Insert(a2);
                     ids.Add(a2.Id);
                 }
 
@@ -110,13 +110,13 @@ namespace XUnitTestData
             public void GuidKey_UsingReturnValue()
             {
                 Animal a = new Animal { Name = "Name" };
-                database.agileClient.DBSession.Insert(a);
+                Base.agileClient.DBSession.Insert(a);
                 DateTime start = DateTime.Now;
                 List<Guid> ids = new List<Guid>();
                 for (int i = 0; i < cnt; i++)
                 {
                     Animal a2 = new Animal { Name = "Name" + i };
-                    var id = database.agileClient.DBSession.Insert(a2);
+                    var id = Base.agileClient.DBSession.Insert(a2);
                     ids.Add(id);
                 }
 
@@ -129,14 +129,14 @@ namespace XUnitTestData
             public void AssignKey_UsingEntity()
             {
                 Car ca = new Car { Id = string.Empty.PadLeft(15, '0'), Name = "Name" };
-                database.agileClient.DBSession.Insert(ca);
+                Base.agileClient.DBSession.Insert(ca);
                 DateTime start = DateTime.Now;
                 List<string> ids = new List<string>();
                 for (int i = 0; i < cnt; i++)
                 {
                     var key = (i + 1).ToString().PadLeft(15, '0');
                     Car ca2 = new Car { Id = key, Name = "Name" + i };
-                    database.agileClient.DBSession.Insert(ca2);
+                    Base.agileClient.DBSession.Insert(ca2);
                     ids.Add(ca2.Id);
                 }
 
@@ -149,14 +149,14 @@ namespace XUnitTestData
             public void AssignKey_UsingReturnValue()
             {
                 Car ca = new Car { Id = string.Empty.PadLeft(15, '0'), Name = "Name" };
-                database.agileClient.DBSession.Insert(ca);
+                Base.agileClient.DBSession.Insert(ca);
                 DateTime start = DateTime.Now;
                 List<string> ids = new List<string>();
                 for (int i = 0; i < cnt; i++)
                 {
                     var key = (i + 1).ToString().PadLeft(15, '0');
                     Car ca2 = new Car { Id = key, Name = "Name" + i };
-                    var id = database.agileClient.DBSession.Insert(ca2);
+                    var id = Base.agileClient.DBSession.Insert(ca2);
                     ids.Add(id);
                 }
 

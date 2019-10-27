@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 
-namespace XUnitTestData.Model
+namespace XUnitTestOracle.Model
 {
     public class Person
     {

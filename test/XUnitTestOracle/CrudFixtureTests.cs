@@ -1,24 +1,22 @@
-using Agile.Data;
 using Agile.Data.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
-using XUnitTestData.Model;
+using XUnitTestOracle.Model;
 
-namespace XUnitTestData
+namespace XUnitTestOracle
 {
     /// <summary>
     /// 基础 增删改查 测试
     /// </summary>
     public class CrudFixtureTests
     {
-        public class InsertMethod : IClassFixture<BaseFixture>
+        public class InsertMethod : IClassFixture<OracleBaseFixture>
         {
-            BaseFixture database;
+            OracleBaseFixture database;
 
-            public InsertMethod(BaseFixture data)
+            public InsertMethod(OracleBaseFixture data)
             {
                 database = data;
             }
@@ -69,11 +67,11 @@ namespace XUnitTestData
         }
 
 
-        public class GetMethod : IClassFixture<BaseFixture>
+        public class GetMethod : IClassFixture<OracleBaseFixture>
         {
-            BaseFixture database;
+            OracleBaseFixture database;
 
-            public GetMethod(BaseFixture data)
+            public GetMethod(OracleBaseFixture data)
             {
                 database = data;
             }
@@ -110,11 +108,11 @@ namespace XUnitTestData
         }
 
 
-        public class DeleteMethod : IClassFixture<BaseFixture>
+        public class DeleteMethod : IClassFixture<OracleBaseFixture>
         {
-            BaseFixture database;
+            OracleBaseFixture database;
 
-            public DeleteMethod(BaseFixture data)
+            public DeleteMethod(OracleBaseFixture data)
             {
                 database = data;
             }
@@ -190,11 +188,11 @@ namespace XUnitTestData
         }
 
 
-        public class UpdateMethod : IClassFixture<BaseFixture>
+        public class UpdateMethod : IClassFixture<OracleBaseFixture>
         {
-            BaseFixture database;
+            OracleBaseFixture database;
 
-            public UpdateMethod(BaseFixture data)
+            public UpdateMethod(OracleBaseFixture data)
             {
                 database = data;
             }
@@ -215,7 +213,7 @@ namespace XUnitTestData
                 p2.FirstName = "Baz";
                 p2.Active = false;
 
-                database.agileClient.DBSession.Update(p2,new { LastName = "Bar" });
+                database.agileClient.DBSession.Update(p2);
 
                 var p3 = database.agileClient.DBSession.Get<Person>(id);
                 Assert.Equal("Baz", p3.FirstName);
@@ -242,11 +240,11 @@ namespace XUnitTestData
         }
 
 
-        public class GetListMethod : IClassFixture<BaseFixture>
+        public class GetListMethod : IClassFixture<OracleBaseFixture>
         {
-            BaseFixture database;
+            OracleBaseFixture database;
 
-            public GetListMethod(BaseFixture data)
+            public GetListMethod(OracleBaseFixture data)
             {
                 database = data;
             }
@@ -293,11 +291,11 @@ namespace XUnitTestData
         }
 
 
-        public class GetPageMethod : IClassFixture<BaseFixture>
+        public class GetPageMethod : IClassFixture<OracleBaseFixture>
         {
-            BaseFixture database;
+            OracleBaseFixture database;
 
-            public GetPageMethod(BaseFixture data)
+            public GetPageMethod(OracleBaseFixture data)
             {
                 database = data;
             }
@@ -317,7 +315,7 @@ namespace XUnitTestData
                                     };
 
                 int allRowsCount = 0;
-                IEnumerable<Person> list = database.agileClient.DBSession.GetPageList<Person>(0, 2, out allRowsCount, null, sort);
+                IEnumerable<Person> list = database.agileClient.DBSession.GetPageList<Person>(1, 2, out allRowsCount, null, sort);
                 Assert.Equal(2, list.Count());
                 Assert.Equal(id2, list.First().Id);
                 Assert.Equal(id1, list.Skip(1).First().Id);
@@ -339,7 +337,7 @@ namespace XUnitTestData
                                     };
 
                 int allRowsCount = 0;
-                IEnumerable<Person> list = database.agileClient.DBSession.GetPageList<Person>( 0, 2, out allRowsCount, predicate, sort);
+                IEnumerable<Person> list = database.agileClient.DBSession.GetPageList<Person>( 1, 3, out allRowsCount, predicate, sort);
                 Assert.Equal(2, list.Count());
                 Assert.True(list.All(p => p.FirstName == "Sigma" || p.FirstName == "Theta"));
             }
@@ -359,7 +357,7 @@ namespace XUnitTestData
                                     };
 
                 int allRowsCount = 0;
-                IEnumerable<Person> list = database.agileClient.DBSession.GetPageList<Person>(1, 2, out allRowsCount, null, sort);
+                IEnumerable<Person> list = database.agileClient.DBSession.GetPageList<Person>(2, 2, out allRowsCount, null, sort);
                 Assert.Equal(2, list.Count());
                 Assert.Equal(id4, list.First().Id);
                 Assert.Equal(id3, list.Skip(1).First().Id);
@@ -381,18 +379,18 @@ namespace XUnitTestData
                                     };
 
                 int allRowsCount = 0;
-                IEnumerable<Person> list = database.agileClient.DBSession.GetPageList<Person>(0, 2, out allRowsCount, predicate, sort);
+                IEnumerable<Person> list = database.agileClient.DBSession.GetPageList<Person>(1, 3, out allRowsCount, predicate, sort);
                 Assert.Equal(2, list.Count());
                 Assert.True(list.All(p => p.FirstName == "Sigma" || p.FirstName == "Theta"));
             }
         }
 
 
-        public class CountMethod : IClassFixture<BaseFixture>
+        public class CountMethod : IClassFixture<OracleBaseFixture>
         {
-            BaseFixture database;
+            OracleBaseFixture database;
 
-            public CountMethod(BaseFixture data)
+            public CountMethod(OracleBaseFixture data)
             {
                 database = data;
             }
@@ -405,7 +403,7 @@ namespace XUnitTestData
                 database.agileClient.DBSession.Insert(new Person { Active = true, FirstName = "c", LastName = "c1", DateCreated = DateTime.UtcNow.AddDays(-3) });
                 database.agileClient.DBSession.Insert(new Person { Active = false, FirstName = "d", LastName = "d1", DateCreated = DateTime.UtcNow.AddDays(-1) });
 
-                int count = database.agileClient.DBSession.Count<Person>();
+                int count = database.agileClient.DBSession.Count<Person>(null);
                 Assert.Equal(4, count);
             }
 
@@ -437,11 +435,11 @@ namespace XUnitTestData
         }
 
 
-        public class GetMultipleMethod : IClassFixture<BaseFixture>
+        public class GetMultipleMethod : IClassFixture<OracleBaseFixture>
         {
-            BaseFixture database;
+            OracleBaseFixture database;
 
-            public GetMultipleMethod(BaseFixture data)
+            public GetMultipleMethod(OracleBaseFixture data)
             {
                 database = data;
             }
@@ -472,312 +470,6 @@ namespace XUnitTestData
                 Assert.Equal(2, animals.Count);
                 Assert.Single(people2);
             }
-        }
-
-
-
-        public class SQLCommandMethod : IClassFixture<BaseFixture>
-        {
-            BaseFixture database;
-
-            public SQLCommandMethod(BaseFixture data)
-            {
-                database = data;
-            }
-
-
-            [Fact]
-            public void Test_ExecuteSql()
-            {
-                database.agileClient.DBSession.ExecuteSql("delete from car");
-                //////////////////////////////插入/////////////////////////////
-                //拼写sql
-                var sql = "insert car(id,name) values ('1','测试名称1')";
-                int affectedRows = database.agileClient.DBSession.ExecuteSql(sql);
-
-                //参数化sql 匿名类 实体类 字典
-                var paramSql = "insert car(id,name) values (@id,@name)";
-
-                //一条
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new { id = "2", name = "测试2" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Car { Id = "3", Name = "测试3" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Dictionary<string, object> { { "Id", "4" }, { "Name", "测试4" } });
-
-                //多条
-                var paramList1 = new[]
-                {
-                    new { id = "5", name = "测试5" },
-                    new { id = "6", name = "测试6" },
-                    new { id = "7", name = "测试7" }
-                };
-                var paramList2 = new List<Car>
-                {
-                    new Car { Id = "8", Name = "测试8" },
-                    new Car { Id = "9", Name = "测试9" },
-                    new Car { Id = "10", Name = "测试10" }
-                };
-                var paramList3 = new[]
-                {
-                    new Dictionary<string, object> { { "Id", "11" }, { "Name", "测试11" } },
-                    new Dictionary<string, object> { { "Id", "12" }, { "Name", "测试12" } },
-                    new Dictionary<string, object> { { "Id", "13" }, { "Name", "测试13" } }
-                };
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList1);
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList2);
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList3);
-
-
-                ///////////////////////////////更新////////////////////////////////
-                //拼写sql
-                sql = "update car set name='修改名称10-修改' where id='10'";
-                affectedRows = database.agileClient.DBSession.ExecuteSql(sql);
-
-                //参数化sql 匿名类 实体类 字典
-                paramSql = "update car set name=@name where id=@id";
-
-                //一条
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new { id = "2", name = "测试2-修改" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Car { Id = "3", Name = "测试3-修改" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Dictionary<string, object> { { "Id", "4" }, { "Name", "测试4-修改" } });
-
-                //多条
-                paramList1 = new[]
-                {
-                    new { id = "5", name = "测试5-修改" },
-                    new { id = "6", name = "测试6-修改" },
-                    new { id = "7", name = "测试7-修改" }
-                };
-                paramList2 = new List<Car>
-                {
-                    new Car { Id = "8", Name = "测试8-修改" },
-                    new Car { Id = "9", Name = "测试9-修改" },
-                    new Car { Id = "10", Name = "测试10-修改" }
-                };
-                paramList3 = new[]
-                {
-                    new Dictionary<string, object> { { "Id", "11" }, { "Name", "测试11-修改" } },
-                    new Dictionary<string, object> { { "Id", "12" }, { "Name", "测试12-修改" } },
-                    new Dictionary<string, object> { { "Id", "13" }, { "Name", "测试13-修改" } }
-                };
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList1);
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList2);
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList3);
-
-
-                ///////////////////////////////删除////////////////////////////////
-                //拼写sql
-                sql = "delete from car  where id='10'";
-                affectedRows = database.agileClient.DBSession.ExecuteSql(sql);
-
-                //参数化sql 匿名类 实体类 字典
-                paramSql = "delete from car where id=@id";
-
-                //一条
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new { id = "2", name = "测试2" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Car { Id = "3", Name = "测试3" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Dictionary<string, object> { { "Id", "4" }, { "Name", "测试4" } });
-
-                //多条
-                paramList1 = new[]
-                {
-                    new { id = "5", name = "测试5" },
-                    new { id = "6", name = "测试6" },
-                    new { id = "7", name = "测试7" }
-                };
-                paramList2 = new List<Car>
-                {
-                    new Car { Id = "8", Name = "测试8" },
-                    new Car { Id = "9", Name = "测试9" },
-                    new Car { Id = "10", Name = "测试10" }
-                };
-                paramList3 = new[]
-                {
-                    new Dictionary<string, object> { { "Id", "11" }, { "Name", "测试11" } },
-                    new Dictionary<string, object> { { "Id", "12" }, { "Name", "测试12" } },
-                    new Dictionary<string, object> { { "Id", "13" }, { "Name", "测试13" } }
-                };
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList1);
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList2);
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, paramList3);
-
-
-                Assert.True(affectedRows > 0);
-            }
-
-            [Fact]
-            public void Test_ExecuteScalar()
-            {
-                database.agileClient.DBSession.ExecuteSql("delete from car");
-                //////////////////////////////插入/////////////////////////////
-                //拼写sql
-                var sql = "insert car(id,name) values ('1','测试名称1')";
-                int affectedRows = database.agileClient.DBSession.ExecuteSql(sql);
-
-                //参数化sql 匿名类 实体类 字典
-                var paramSql = "insert car(id,name) values (@id,@name)";
-
-                //一条
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new { id = "2", name = "测试2" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Car { Id = "3", Name = "测试3" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Dictionary<string, object> { { "Id", "4" }, { "Name", "测试4" } });
-
-
-
-                var name = database.agileClient.DBSession.ExecuteScalar("select name from car where id='2'");
-                var id = database.agileClient.DBSession.ExecuteScalar<int>("select id from car where id='2'");
-
-                Assert.True(id == 2);
-            }
-
-
-            [Fact]
-            public void Test_Query()
-            {
-                database.agileClient.DBSession.ExecuteSql("delete from car");
-                //////////////////////////////插入/////////////////////////////
-                //拼写sql
-                var sql = "insert car(id,name) values ('1','测试名称1')";
-                int affectedRows = database.agileClient.DBSession.ExecuteSql(sql);
-
-                //参数化sql 匿名类 实体类 字典
-                var paramSql = "insert car(id,name) values (@id,@name)";
-
-                //一条
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new { id = "2", name = "测试2" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Car { Id = "3", Name = "测试3" });
-                affectedRows = database.agileClient.DBSession.ExecuteSql(paramSql, new Dictionary<string, object> { { "Id", "4" }, { "Name", "测试4" } });
-
-                var model1 = database.agileClient.DBSession.QueryFirst<Car>("select * from car");
-                var model2 = database.agileClient.DBSession.QueryFirstOrDefault<Car>("select * from car where id='111'");
-                var model3 = database.agileClient.DBSession.QuerySingle<Car>("select * from car where id='2'");
-                var model4 = database.agileClient.DBSession.QuerySingleOrDefault<Car>("select * from car where id='111'");
-
-                int allCount = 0;
-
-                var lst = database.agileClient.DBSession.QueryList<Car>("select * from car");
-                var lst2 = database.agileClient.DBSession.QueryPageList<Car>("select * from car", 0, 2, out allCount);
-
-                var dt = database.agileClient.DBSession.QueryDataTable("select * from car");
-                var dt2 = database.agileClient.DBSession.QueryPageDataTable("select * from car where id=@id", 0, 2, out allCount, new { id = "2", name = "测试2" });
-
-
-
-                Assert.True(model1 != null);
-            }
-
-
-
-
-
-
-
-
-
-
-            [Fact]
-            public void Ext_RunInTransaction_UsingAction()
-            {
-                Action<IDbSession> processDelegate = (IDbSession db) =>
-                {
-                    Multikey m = new Multikey { Key2 = "key", Value = "foo" };
-                    var key = db.Insert(m);
-
-                    Animal a1 = new Animal { Name = "Foo" };
-                    db.Insert(a1);
-
-                    //session.ExecuteCommad("select * from dual");
-                    Assert.Equal(1, key.Key1);
-                    //Assert.Equal("key", key.Key2);
-
-                    //Task.Factory.StartNew(() => {
-                    //    var dt = session.ExecuteDataTable("select * from Multikey");
-                    //    //var dt2 = session.ExecuteDataTable("select * from Animal");
-                    //});
-                };
-                database.agileClient.RunInTransaction(processDelegate);
-            }
-
-
-            [Fact]
-            public void Ext_RunInTransaction_UsingFunc()
-            {
-                Func<IDbSession, int> processDelegate = (IDbSession db) =>
-                {
-                    Multikey m = new Multikey { Key2 = "key", Value = "foo" };
-                    var key = db.Insert(m);
-
-                    Animal a1 = new Animal { Name = "Foo" };
-                    db.Insert(a1);
-
-                    //session.ExecuteCommad("select * from dual");
-                    Assert.Equal(1, key.Key1);
-                    //Assert.Equal("key", key.Key2);
-
-                    //Task.Factory.StartNew(() => {
-                    //    var dt = session.ExecuteDataTable("select * from Multikey");
-                    //    //var dt2 = session.ExecuteDataTable("select * from Animal");
-                    //});
-
-                    return key.Key1;
-                };
-                int ret = database.agileClient.RunInTransaction<int>(processDelegate);
-                Assert.Equal(1, ret);
-            }
-
-
-
-            //[Fact]
-            //public void Ext_Multithread_UsingEntity()
-            //{
-            //    Animal a = new Animal { Name = "Name" };
-            //    database.agileClient.DBSession.Insert(a);
-            //    DateTime start = DateTime.Now;
-            //    List<Guid> ids = new List<Guid>();
-            //    for (int i = 0; i < cnt; i++)
-            //    {
-            //        Animal a2 = new Animal { Name = "Name" + i };
-            //        Task.Factory.StartNew(() =>
-            //        {
-            //            //多线程测试并发
-            //            database.agileClient.DBSession.Insert(a2);
-            //            ids.Add(a2.Id);
-            //        });
-            //    }
-
-            //    double total = DateTime.Now.Subtract(start).TotalMilliseconds;
-            //    Console.WriteLine("Total Time:" + total);
-            //    Console.WriteLine("Average Time:" + total / cnt);
-            //}
-
-
-
-            //[Fact]
-            //public void Ext_SqlCommand_SqlMap()
-            //{
-            //    Animal a1 = new Animal { Name = "Foo" };
-            //    Animal a2 = new Animal { Name = "Bar" };
-            //    Animal a3 = new Animal { Name = "Baz" };
-
-            //    List<Animal> lst = new List<Animal>() { a1, a2, a3 };
-
-            //    database.agileClient.DBSession.InsertBatch<Animal>(lst);
-            //    var animals = database.agileClient.DBSession.GetList<Animal>().ToList();
-            //    Assert.Equal(3, animals.Count);
-
-            //    var fileName = "AgileSqlMap.xml";
-            //    var filePath = $"{Path.Combine(Environment.CurrentDirectory, "SqlMap")}{Path.DirectorySeparatorChar}{fileName}";
-
-            //    Dictionary<string, object> collection = new Dictionary<string, object>();
-            //    collection.Add("Name", "Foo");
-            //    var cmd = SQLMapHelper.GetByCode(filePath, "test4", collection);
-            //    string sql = cmd.TransferedSQL;
-
-            //    dynamic param = new { Name = "Foo" };
-            //    var a = database.agileClient.DBSession.QueryFirstOrDefault<Animal>(sql, param);
-            //    Assert.Equal(a1.Id, a.Id);
-            //}
-
-
         }
     }
 }

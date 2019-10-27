@@ -4,13 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace XUnitTestData
+namespace XUnitTestSqlServer
 {
-    public class BaseFixture
+    public class SqlServerBaseFixture
     {
         public AgileClient agileClient;
 
-        public BaseFixture()
+        public SqlServerBaseFixture()
         {
             //string connectionString = "Data Source=192.168.200.154;Initial Catalog=xjtc;User Id=sa;Password=Sendinfo.2017;Persist Security Info=True;";
             string connectionString = "Data Source=127.0.0.1;Initial Catalog=dapper;User Id=sa;Password=123456;Persist Security Info=True;";
@@ -28,11 +28,11 @@ namespace XUnitTestData
 
             var files = new List<string>
             {
-                ReadScriptFile("SqlServer","CreateAnimalTable"),
-                ReadScriptFile("SqlServer","CreateFooTable"),
-                ReadScriptFile("SqlServer","CreateMultikeyTable"),
-                ReadScriptFile("SqlServer","CreatePersonTable"),
-                ReadScriptFile("SqlServer","CreateCarTable")
+                ReadScriptFile("CreateAnimalTable"),
+                ReadScriptFile("CreateFooTable"),
+                ReadScriptFile("CreateMultikeyTable"),
+                ReadScriptFile("CreatePersonTable"),
+                ReadScriptFile("CreateCarTable")
             };
 
             foreach (var setupFile in files)
@@ -45,12 +45,11 @@ namespace XUnitTestData
         /// <summary>
         /// 读取初始化脚本
         /// </summary>
-        /// <param name="sql"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public string ReadScriptFile(string sql,string name)
+        public string ReadScriptFile(string name)
         {
-            string fileName = $"{GetType().Namespace}.{sql}.{name}.sql";
+            string fileName = GetType().Namespace + ".Sql." + name + ".sql";
             using (Stream s = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(fileName))
             using (StreamReader sr = new StreamReader(s))
             {

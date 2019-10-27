@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Sql\CreateAnimalTable.sql" />
+    <None Remove="Sql\CreateCarTable.sql" />
+    <None Remove="Sql\CreateFooTable.sql" />
+    <None Remove="Sql\CreateMultikeyTable.sql" />
+    <None Remove="Sql\CreatePersonTable.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Sql\CreateAnimalTable.sql" />
+    <EmbeddedResource Include="Sql\CreateCarTable.sql" />
+    <EmbeddedResource Include="Sql\CreateFooTable.sql" />
+    <EmbeddedResource Include="Sql\CreateMultikeyTable.sql" />
+    <EmbeddedResource Include="Sql\CreatePersonTable.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Agile.Data\Agile.Data.csproj" />
+  </ItemGroup>
+
+</Project>
